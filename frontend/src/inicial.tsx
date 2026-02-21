@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FightHub — Kickboxing Database</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #E8192C;
+    --red-dark: #B01020;
+    --gold: #F5A623;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --dark3: #242424;
+    --dark4: #2E2E2E;
+    --gray: #555;
+    --gray-light: #888;
+    --white: #F5F5F0;
+    --white-dim: rgba(245,245,240,0.7);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  nav {
+    background: var(--dark);
+    border-bottom: 2px solid var(--red);
+    position: sticky; top:0; z-index: 1000;
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 0;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--white);
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-right: 40px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-logo span { color: var(--red); }
+  .nav-links { display: flex; gap: 4px; flex: 1; }
+  .nav-links a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600; font-size: 14px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--gray-light); text-decoration: none;
+    padding: 8px 14px; border-radius: 2px;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); background: var(--dark3); }
+  .nav-links a.active { color: var(--red); }
+  .nav-right { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 18px; border: none; border-radius: 2px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline { background: transparent; border: 1.5px solid var(--dark4); color: var(--gray-light); }
+  .btn-outline:hover { border-color: var(--white); color: var(--white); }
+  .btn-red { background: var(--red); color: var(--white); }
+  .btn-red:hover { background: var(--red-dark); }
+
+  /* HERO */
+  .hero {
+    background: var(--dark); position: relative; overflow: hidden;
+    padding: 80px 40px; display: flex; align-items: center; gap: 60px; min-height: 480px;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(232,25,44,0.03) 40px, rgba(232,25,44,0.03) 41px);
+  }
+  .hero-text { position: relative; z-index: 1; flex: 1; }
+  .hero-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+    font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--red); margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 100px); line-height: 0.9;
+    letter-spacing: 2px; color: var(--white); margin-bottom: 20px;
+  }
+  .hero h1 em { color: var(--red); font-style: normal; }
+  .hero p { font-size: 16px; color: var(--white-dim); max-width: 420px; margin-bottom: 30px; line-height: 1.7; }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-visual { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
+  .stat-card {
+    background: var(--dark2); border: 1px solid var(--dark4); border-left: 3px solid var(--red);
+    padding: 16px 24px; min-width: 200px;
+  }
+  .stat-card .num { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--white); line-height: 1; }
+  .stat-card .label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); margin-top: 4px; }
+
+  /* SECTIONS */
+  .section { padding: 48px 40px; }
+  .section-header {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 28px; border-bottom: 1px solid var(--dark4); padding-bottom: 14px;
+  }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--white); }
+  .section-sub { font-size: 12px; color: var(--gray-light); letter-spacing: 1px; text-transform: uppercase; }
+  .see-all {
+    margin-left: auto; font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--red); cursor: pointer; text-decoration: none;
+  }
+  .see-all:hover { color: var(--gold); }
+
+  /* FIGHTER CARDS */
+  .fighters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .fighter-card {
+    background: var(--dark2); border: 1px solid var(--dark4);
+    overflow: hidden; cursor: pointer; transition: all 0.25s; position: relative;
+  }
+  .fighter-card:hover { border-color: var(--red); transform: translateY(-2px); }
+  .fighter-card-img {
+    width: 100%; height: 220px;
+    background: var(--dark3); display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .fighter-card-img::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(transparent, var(--dark2));
+  }
+  .fighter-rank {
+    position: absolute; top: 10px; left: 10px; background: var(--red);
+    font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+    padding: 2px 8px; letter-spacing: 1px; z-index: 2;
+  }
+  .fighter-card-body { padding: 14px 16px 16px; }
+  .fighter-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; color: var(--white); margin-bottom: 4px; }
+  .fighter-nick { font-size: 12px; color: var(--gold); margin-bottom: 8px; font-style: italic; }
+  .fighter-meta { font-size: 12px; color: var(--gray-light); margin-bottom: 10px; }
+  .fighter-record { display: flex; gap: 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; }
+  .rec-w { color: #4CAF50; } .rec-l { color: var(--red); } .rec-d { color: var(--gold); }
+
+  /* EVENTS */
+  .events-list { display: flex; flex-direction: column; gap: 10px; }
+  .event-item {
+    background: var(--dark2); border: 1px solid var(--dark4); padding: 16px 20px;
+    display: grid; grid-template-columns: 100px 1fr auto; align-items: center; gap: 20px;
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .event-item:hover { border-color: var(--red); }
+  .event-date { text-align: center; background: var(--dark3); padding: 10px; }
+  .event-date .month { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); }
+  .event-date .day { font-family: 'Bebas Neue', sans-serif; font-size: 36px; line-height: 1; color: var(--white); }
+  .event-date .year { font-size: 11px; color: var(--gray-light); }
+  .event-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--white); margin-bottom: 4px; }
+  .event-org { font-size: 12px; color: var(--gold); margin-bottom: 4px; }
+  .event-location { font-size: 13px; color: var(--gray-light); }
+  .event-status { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; }
+  .status-upcoming { background: rgba(245,166,35,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .status-results { background: rgba(76,175,80,0.1); color: #4CAF50; border: 1px solid #4CAF50; }
+  .status-live { background: rgba(232,25,44,0.2); color: var(--red); border: 1px solid var(--red); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.5} }
+
+  /* TEAMS */
+  .teams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .team-card {
+    background: var(--dark2); border: 1px solid var(--dark4); padding: 20px;
+    cursor: pointer; transition: all 0.2s; display: flex; gap: 16px; align-items: flex-start;
+  }
+  .team-card:hover { border-color: var(--red); }
+  .team-logo {
+    width: 70px; height: 70px; background: var(--dark3); border: 1px solid var(--dark4);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; flex-shrink: 0;
+  }
+  .team-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--white); margin-bottom: 4px; }
+  .team-location { font-size: 12px; color: var(--gold); margin-bottom: 8px; }
+  .team-stats { display: flex; gap: 16px; margin-top: 8px; }
+  .team-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--white); line-height: 1; }
+  .team-stat-lbl { font-size: 10px; color: var(--gray-light); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* PROFILE */
+  .profile-header { background: var(--dark); position: relative; overflow: hidden; }
+  .profile-bg { position: absolute; inset: 0; background: linear-gradient(to right, var(--dark) 40%, transparent); z-index: 1; }
+  .profile-bg-img {
+    position: absolute; right: 0; top: 0; height: 100%; width: 50%;
+    background: var(--dark2); display: flex; align-items: center; justify-content: center;
+    font-size: 120px; color: var(--dark3); overflow: hidden;
+  }
+  .profile-content { position: relative; z-index: 2; padding: 48px 40px; max-width: 600px; }
+  .profile-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .profile-name { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 0.9; letter-spacing: 2px; margin-bottom: 8px; }
+  .profile-nick { font-size: 18px; color: var(--gold); font-style: italic; margin-bottom: 20px; }
+  .profile-record { display: flex; gap: 20px; margin-bottom: 24px; align-items: baseline; }
+  .record-block { text-align: center; }
+  .record-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; }
+  .record-num.w { color: #4CAF50; } .record-num.l { color: var(--red); } .record-num.d { color: var(--gold); }
+  .record-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); }
+  .record-sep { font-size: 36px; color: var(--dark4); align-self: center; }
+  .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tag { background: var(--dark3); border: 1px solid var(--dark4); font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; color: var(--gray-light); }
+  .tag.red { border-color: var(--red); color: var(--red); background: rgba(232,25,44,0.08); }
+  .profile-info-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--dark4); border: 1px solid var(--dark4); }
+  .info-cell { background: var(--dark2); padding: 16px 20px; }
+  .info-cell .val { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+  .info-cell .key { font-size: 11px; color: var(--gray-light); text-transform: uppercase; letter-spacing: 1.5px; }
+
+  /* FIGHTS */
+  .fight-row {
+    display: grid; grid-template-columns: 80px 1fr 60px 1fr 140px 80px;
+    align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--dark3);
+    background: var(--dark2); gap: 12px; transition: background 0.15s; cursor: pointer;
+  }
+  .fight-row:hover { background: var(--dark3); }
+  .fight-result { font-family: 'Bebas Neue', sans-serif; font-size: 24px; text-align: center; }
+  .fight-result.W { color: #4CAF50; } .fight-result.L { color: var(--red); } .fight-result.D { color: var(--gold); }
+  .fight-opponent { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: var(--white); }
+  .fight-method { font-size: 13px; color: var(--gray-light); }
+  .fight-event { font-size: 12px; color: var(--gold); }
+  .fight-date { font-size: 12px; color: var(--gray-light); text-align: right; }
+
+  /* TABS */
+  .tabs { display: flex; border-bottom: 1px solid var(--dark4); background: var(--dark); padding: 0 40px; }
+  .tab-btn {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-light);
+    padding: 16px 20px; border-bottom: 2px solid transparent;
+    cursor: pointer; transition: all 0.2s;
+    background: none; border-left: none; border-right: none; border-top: none;
+  }
+  .tab-btn:hover { color: var(--white); }
+  .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* RANKINGS */
+  .weight-class-selector { display: flex; gap: 8px; flex-wrap: wrap; padding: 24px 40px; background: var(--dark2); border-bottom: 1px solid var(--dark3); }
+  .wc-btn {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; padding: 8px 16px;
+    border: 1px solid var(--dark4); background: transparent; color: var(--gray-light);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .wc-btn:hover { border-color: var(--white); color: var(--white); }
+  .wc-btn.active { background: var(--red); border-color: var(--red); color: var(--white); }
+  .ranking-table { width: 100%; border-collapse: collapse; }
+  .ranking-table thead tr { background: var(--dark3); border-bottom: 2px solid var(--red); }
+  .ranking-table th { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray-light); padding: 10px 16px; text-align: left; }
+  .ranking-table tbody tr { border-bottom: 1px solid var(--dark3); transition: background 0.15s; cursor: pointer; }
+  .ranking-table tbody tr:hover { background: var(--dark2); }
+  .ranking-table td { padding: 12px 16px; font-size: 14px; }
+  .rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gray-light); }
+  .rank-num.top3 { color: var(--gold); }
+  .chip { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; background: var(--dark3); color: var(--gray-light); }
+  .chip.gold { background: rgba(245,166,35,0.15); color: var(--gold); }
+
+  /* AUTH */
+  .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--black); position: relative; overflow: hidden; }
+  .auth-page::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 50%, rgba(232,25,44,0.05) 0%, transparent 60%); }
+  .auth-box { background: var(--dark2); border: 1px solid var(--dark4); border-top: 3px solid var(--red); padding: 48px 40px; width: 100%; max-width: 440px; position: relative; z-index: 1; }
+  .auth-logo { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; text-align: center; margin-bottom: 8px; }
+  .auth-logo span { color: var(--red); }
+  .auth-sub { text-align: center; font-size: 13px; color: var(--gray-light); margin-bottom: 32px; letter-spacing: 1px; }
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); margin-bottom: 6px; display: block; }
+  .form-input { width: 100%; background: var(--dark3); border: 1px solid var(--dark4); color: var(--white); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 12px 14px; outline: none; transition: border-color 0.2s; }
+  .form-input:focus { border-color: var(--red); }
+  .form-input::placeholder { color: var(--gray); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  select.form-input option { background: var(--dark3); }
+  .auth-divider { border: none; border-top: 1px solid var(--dark4); margin: 24px 0; }
+  .auth-footer { text-align: center; margin-top: 8px; font-size: 13px; color: var(--gray-light); }
+  .auth-footer a { color: var(--red); cursor: pointer; text-decoration: none; }
+  .auth-footer a:hover { color: var(--gold); }
+
+  /* SEARCH */
+  .search-bar-section { background: var(--dark2); border-bottom: 1px solid var(--dark3); padding: 20px 40px; display: flex; gap: 12px; align-items: center; }
+  .search-input { flex: 1; background: var(--dark3); border: 1px solid var(--dark4); color: var(--white); font-family: 'Barlow', sans-serif; font-size: 15px; padding: 12px 16px; outline: none; transition: border-color 0.2s; }
+  .search-input:focus { border-color: var(--red); }
+  .filter-select { background: var(--dark3); border: 1px solid var(--dark4); color: var(--gray-light); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1px; padding: 12px 16px; outline: none; cursor: pointer; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--dark2); border: 1px solid var(--dark4); border-top: 3px solid var(--red); width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--gray-light); font-size: 24px; cursor: pointer; }
+  .modal-close:hover { color: var(--white); }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; margin-bottom: 24px; color: var(--white); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 3000; background: var(--dark2); border-left: 3px solid #4CAF50; padding: 14px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); transform: translateX(200%); transition: transform 0.3s; pointer-events: none; }
+  .toast.show { transform: translateX(0); }
+  .toast.error { border-left-color: var(--red); }
+
+  /* BREADCRUMB */
+  .breadcrumb { padding: 12px 40px; background: var(--dark); border-bottom: 1px solid var(--dark3); font-size: 13px; color: var(--gray-light); display: flex; gap: 8px; align-items: center; }
+  .breadcrumb a { color: var(--gray-light); cursor: pointer; }
+  .breadcrumb a:hover { color: var(--red); }
+  .breadcrumb .sep { color: var(--dark4); }
+  .breadcrumb .current { color: var(--white); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--dark4); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+  @media (max-width: 768px) {
+    .hero { flex-direction: column; padding: 40px 20px; }
+    .hero-visual { flex-direction: row; flex-wrap: wrap; }
+    .section { padding: 32px 20px; }
+    .search-bar-section { padding: 16px 20px; flex-wrap: wrap; }
+    .tabs { padding: 0 20px; }
+    .weight-class-selector { padding: 16px 20px; }
+    .breadcrumb { padding: 10px 20px; }
+    nav { padding: 0 16px; }
+    .profile-content { padding: 32px 20px; }
+    .profile-name { font-size: 48px; }
+    .profile-bg-img { display: none; }
+    .fight-row { grid-template-columns: 50px 1fr 1fr; }
+    .event-item { grid-template-columns: 80px 1fr; }
+    .event-status { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <div class="nav-logo" onclick="showPage('home')">FIGHT<span>HUB</span></div>
+  <div class="nav-links">
+    <a onclick="showPage('home')" data-page="home">Início</a>
+    <a onclick="showPage('fighters')" data-page="fighters">Lutadores</a>
+    <a onclick="showPage('teams')" data-page="teams">Equipes</a>
+    <a onclick="showPage('events')" data-page="events">Eventos</a>
+    <a onclick="showPage('rankings')" data-page="rankings">Rankings</a>
+  </div>
+  <div class="nav-right" id="nav-auth">
+    <button class="btn btn-outline" onclick="showPage('login')">Entrar</button>
+    <button class="btn btn-red" onclick="showPage('register')">Cadastrar</button>
+  </div>
+  <div class="nav-right" id="nav-user" style="display:none">
+    <span style="font-size:13px;color:var(--gray-light);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">Olá, <strong style="color:var(--white);" id="user-greeting"></strong></span>
+    <button class="btn btn-outline" onclick="openModal('modal-add-fighter')">+ Lutador</button>
+    <button class="btn btn-outline" onclick="openModal('modal-add-event')">+ Evento</button>
+    <button class="btn btn-red" onclick="logout()">Sair</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">⚡ A maior base de dados de kickboxing do Brasil</div>
+      <h1>O QUE ACONTECE<br>NO <em>RINGUE</em><br>FICA AQUI</h1>
+      <p>Rankings, perfis de atletas, histórico de lutas, equipes e eventos. Tudo sobre kickboxing em um só lugar.</p>
+      <div class="hero-btns">
+        <button class="btn btn-red" onclick="showPage('rankings')">Ver Rankings</button>
+        <button class="btn btn-outline" onclick="showPage('fighters')">Buscar Lutadores</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="stat-card"><div class="num" id="stat-fighters">0</div><div class="label">Atletas Cadastrados</div></div>
+      <div class="stat-card"><div class="num" id="stat-teams">0</div><div class="label">Equipes Registradas</div></div>
+      <div class="stat-card"><div class="num">4.209</div><div class="label">Lutas Registradas</div></div>
+      <div class="stat-card"><div class="num">89</div><div class="label">Eventos em 2025</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Lutadores em Destaque</div>
+      <div class="section-sub">Top ranqueados</div>
+      <a class="see-all" onclick="showPage('fighters')">Ver Todos →</a>
+    </div>
+    <div class="fighters-grid" id="home-fighters"></div>
+  </div>
+  <div class="section" style="background:var(--dark)">
+    <div class="section-header">
+      <div class="section-title">Próximos Eventos</div>
+      <a class="see-all" onclick="showPage('events')">Ver Todos →</a>
+    </div>
+    <div class="events-list" id="home-events"></div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Equipes em Destaque</div>
+      <a class="see-all" onclick="showPage('teams')">Ver Todas →</a>
+    </div>
+    <div class="teams-grid" id="home-teams"></div>
+  </div>
+</div>
+
+<!-- FIGHTERS LIST -->
+<div class="page" id="page-fighters">
+  <div style="background:var(--dark);padding:32px 40px 0;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:4px;">Lutadores</h2>
+    <p style="color:var(--gray-light);font-size:14px;margin-bottom:24px;">Busque e explore o banco de dados de atletas de kickboxing</p>
+  </div>
+  <div class="search-bar-section">
+    <input class="search-input" placeholder="Buscar lutador por nome, apelido, equipe..." id="fighters-search" oninput="filterFighters()">
+    <select class="filter-select" id="fighters-division" onchange="filterFighters()">
+      <option value="">Todas as Categorias</option>
+      <option>Peso Mosca (−52kg)</option><option>Peso Galo (−56kg)</option>
+      <option>Peso Pena (−60kg)</option><option>Peso Leve (−65kg)</option>
+      <option>Peso Meio-Médio (−71kg)</option><option>Peso Médio (−75kg)</option>
+      <option>Peso Meio-Pesado (−81kg)</option><option>Peso Pesado (+81kg)</option>
+    </select>
+  </div>
+  <div class="section">
+    <div id="fighters-count" style="font-size:13px;color:var(--gray-light);margin-bottom:16px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;"></div>
+    <div class="fighters-grid" id="fighters-grid"></div>
+  </div>
+</div>
+
+<!-- FIGHTER PROFILE -->
+<div class="page" id="page-fighter-profile">
+  <div class="breadcrumb">
+    <a onclick="showPage('fighters')">Lutadores</a>
+    <span class="sep">›</span>
+    <span class="current" id="profile-breadcrumb">Perfil</span>
+  </div>
+  <div class="profile-header">
+    <div class="profile-bg"></div>
+    <div class="profile-bg-img" id="profile-avatar">🥊</div>
+    <div class="profile-content">
+      <div class="profile-eyebrow">
+        <span id="profile-flag">🇧🇷</span>
+        <span id="profile-division-tag">Peso Leve</span>
+      </div>
+      <div class="profile-name" id="profile-name">—</div>
+      <div class="profile-nick" id="profile-nick">""</div>
+      <div class="profile-record">
+        <div class="record-block"><div class="record-num w" id="profile-w">0</div><div class="record-lbl">Vitórias</div></div>
+        <div class="record-sep">–</div>
+        <div class="record-block"><div class="record-num l" id="profile-l">0</div><div class="record-lbl">Derrotas</div></div>
+        <div class="record-sep">–</div>
+        <div class="record-block"><div class="record-num d" id="profile-d">0</div><div class="record-lbl">Empates</div></div>
+      </div>
+      <div class="profile-tags" id="profile-tags"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-red" onclick="requireAuth('Seguir Lutador')">+ Seguir</button>
+        <button class="btn btn-outline" onclick="requireAuth('Comparar')">Comparar</button>
+      </div>
+    </div>
+  </div>
+  <div class="profile-info-grid">
+    <div class="info-cell"><div class="val" id="pi-dob">—</div><div class="key">Data de Nascimento</div></div>
+    <div class="info-cell"><div class="val" id="pi-age">—</div><div class="key">Idade</div></div>
+    <div class="info-cell"><div class="val" id="pi-nat">—</div><div class="key">Nacionalidade</div></div>
+    <div class="info-cell"><div class="val" id="pi-height">—</div><div class="key">Altura</div></div>
+    <div class="info-cell"><div class="val" id="pi-weight">—</div><div class="key">Peso</div></div>
+    <div class="info-cell"><div class="val" id="pi-team" style="cursor:pointer;color:var(--red);" onclick="goToTeam()">—</div><div class="key">Equipe</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event,'tab-fights')">Histórico de Lutas</button>
+    <button class="tab-btn" onclick="switchTab(event,'tab-stats')">Estatísticas</button>
+    <button class="tab-btn" onclick="switchTab(event,'tab-about')">Sobre</button>
+  </div>
+  <div class="tab-content active" id="tab-fights"><div id="fight-history"></div></div>
+  <div class="tab-content" id="tab-stats"><div class="section"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;" id="stats-grid"></div></div></div>
+  <div class="tab-content" id="tab-about"><div class="section" style="max-width:700px;"><p id="about-text" style="color:var(--white-dim);line-height:1.8;font-size:15px;"></p></div></div>
+</div>
+
+<!-- TEAMS -->
+<div class="page" id="page-teams">
+  <div style="background:var(--dark);padding:32px 40px 24px;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:4px;">Equipes</h2>
+    <p style="color:var(--gray-light);font-size:14px;">Academias e equipes de kickboxing cadastradas</p>
+  </div>
+  <div class="search-bar-section">
+    <input class="search-input" placeholder="Buscar equipe por nome ou cidade..." id="teams-search" oninput="filterTeams()">
+    <select class="filter-select">
+      <option>Todos os Estados</option>
+      <option>São Paulo</option><option>Rio de Janeiro</option><option>Minas Gerais</option><option>Paraná</option><option>Bahia</option>
+    </select>
+  </div>
+  <div class="section"><div class="teams-grid" id="teams-grid"></div></div>
+</div>
+
+<!-- TEAM PROFILE -->
+<div class="page" id="page-team-profile">
+  <div class="breadcrumb">
+    <a onclick="showPage('teams')">Equipes</a>
+    <span class="sep">›</span>
+    <span class="current" id="team-breadcrumb">Perfil</span>
+  </div>
+  <div style="background:var(--dark);padding:40px;display:flex;gap:32px;align-items:center;flex-wrap:wrap;">
+    <div id="team-profile-logo" style="width:100px;height:100px;background:var(--dark3);border:1px solid var(--dark4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;"></div>
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:8px;" id="team-profile-location"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:2px;line-height:0.9;margin-bottom:12px;" id="team-profile-name">—</div>
+      <div style="font-size:13px;color:var(--gray-light);" id="team-profile-meta"></div>
+      <div style="display:flex;gap:32px;margin-top:20px;">
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;" id="tp-fighters">0</div><div style="font-size:11px;color:var(--gray-light);text-transform:uppercase;letter-spacing:1px;">Lutadores</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;" id="tp-wins">0</div><div style="font-size:11px;color:var(--gray-light);text-transform:uppercase;letter-spacing:1px;">Vitórias</div></div>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;" id="tp-titles">0</div><div style="font-size:11px;color:var(--gray-light);text-transform:uppercase;letter-spacing:1px;">Títulos</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:24px 40px;">
+    <div class="section-title" style="margin-bottom:20px;">Lutadores da Equipe</div>
+    <div class="fighters-grid" id="team-fighters-grid"></div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div class="page" id="page-events">
+  <div style="background:var(--dark);padding:32px 40px 0;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:4px;">Eventos</h2>
+    <p style="color:var(--gray-light);font-size:14px;margin-bottom:0;">Campeonatos, torneios e shows de kickboxing</p>
+  </div>
+  <div class="tabs" style="padding:0 40px;">
+    <button class="tab-btn active" onclick="switchEventsTab(event,'upcoming')">Próximos</button>
+    <button class="tab-btn" onclick="switchEventsTab(event,'past')">Passados</button>
+    <button class="tab-btn" onclick="switchEventsTab(event,'all')">Todos</button>
+  </div>
+  <div class="section"><div class="events-list" id="events-list"></div></div>
+</div>
+
+<!-- RANKINGS -->
+<div class="page" id="page-rankings">
+  <div style="background:var(--dark);padding:32px 40px 0;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:4px;">Rankings</h2>
+    <p style="color:var(--gray-light);font-size:14px;margin-bottom:20px;">Rankings oficiais por categoria de peso — atualizado mensalmente</p>
+  </div>
+  <div class="weight-class-selector" id="wc-selector">
+    <button class="wc-btn active" onclick="selectWC(this,'Peso Pena (−60kg)')">Peso Pena</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Leve (−65kg)')">Peso Leve</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Meio-Médio (−71kg)')">Meio-Médio</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Médio (−75kg)')">Peso Médio</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Meio-Pesado (−81kg)')">Meio-Pesado</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Pesado (+81kg)')">Peso Pesado</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Galo (−56kg)')">Peso Galo</button>
+    <button class="wc-btn" onclick="selectWC(this,'Peso Mosca (−52kg)')">Peso Mosca</button>
+  </div>
+  <div class="section">
+    <div id="ranking-wc-title" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;"></div>
+    <table class="ranking-table">
+      <thead><tr>
+        <th>#</th><th>Lutador</th><th>Equipe</th><th>País</th>
+        <th>V</th><th>D</th><th>Último</th>
+      </tr></thead>
+      <tbody id="ranking-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo">FIGHT<span>HUB</span></div>
+      <div class="auth-sub">Entre na sua conta</div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com" id="login-email"></div>
+      <div class="form-group"><label class="form-label">Senha</label><input class="form-input" type="password" placeholder="••••••••" id="login-password"></div>
+      <button class="btn btn-red" style="width:100%;padding:14px;font-size:14px;margin-top:8px;" onclick="doLogin()">Entrar</button>
+      <hr class="auth-divider">
+      <div class="auth-footer">Não tem conta? <a onclick="showPage('register')">Cadastre-se gratuitamente</a></div>
+      <div class="auth-footer" style="margin-top:8px;"><a onclick="showPage('home')">← Continuar sem entrar</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="page" id="page-register">
+  <div class="auth-page">
+    <div class="auth-box" style="max-width:500px;">
+      <div class="auth-logo">FIGHT<span>HUB</span></div>
+      <div class="auth-sub">Crie sua conta gratuita</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nome</label><input class="form-input" placeholder="João" id="reg-fname"></div>
+        <div class="form-group"><label class="form-label">Sobrenome</label><input class="form-input" placeholder="Silva" id="reg-lname"></div>
+      </div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com" id="reg-email"></div>
+      <div class="form-group"><label class="form-label">Senha</label><input class="form-input" type="password" placeholder="Mínimo 8 caracteres" id="reg-password"></div>
+      <div class="form-group"><label class="form-label">Confirmar Senha</label><input class="form-input" type="password" placeholder="Repita a senha" id="reg-password2"></div>
+      <div class="form-group"><label class="form-label">Perfil</label>
+        <select class="form-input" id="reg-role">
+          <option>Fã / Espectador</option><option>Atleta</option><option>Treinador</option>
+          <option>Promotor de Evento</option><option>Jornalista Esportivo</option>
+        </select>
+      </div>
+      <button class="btn btn-red" style="width:100%;padding:14px;font-size:14px;margin-top:8px;" onclick="doRegister()">Criar Conta</button>
+      <hr class="auth-divider">
+      <div class="auth-footer">Já tem conta? <a onclick="showPage('login')">Entrar</a></div>
+      <div class="auth-footer" style="margin-top:8px;"><a onclick="showPage('home')">← Continuar sem entrar</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD FIGHTER -->
+<div class="modal-overlay" id="modal-add-fighter">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-add-fighter')">✕</button>
+    <div class="modal-title">Cadastrar Lutador</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="af-nome" placeholder="Nome"></div>
+      <div class="form-group"><label class="form-label">Sobrenome</label><input class="form-input" id="af-sobrenome" placeholder="Sobrenome"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Apelido</label><input class="form-input" id="af-apelido" placeholder='"The King"'></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Data de Nascimento</label><input class="form-input" type="date" id="af-dob"></div>
+      <div class="form-group"><label class="form-label">Nacionalidade</label><input class="form-input" id="af-nat" placeholder="Brasileiro(a)"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Altura (cm)</label><input class="form-input" type="number" id="af-altura" placeholder="175"></div>
+      <div class="form-group"><label class="form-label">Peso (kg)</label><input class="form-input" type="number" id="af-peso" placeholder="65"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Categoria de Peso</label>
+      <select class="form-input" id="af-cat">
+        <option>Peso Mosca (−52kg)</option><option>Peso Galo (−56kg)</option>
+        <option>Peso Pena (−60kg)</option><option selected>Peso Leve (−65kg)</option>
+        <option>Peso Meio-Médio (−71kg)</option><option>Peso Médio (−75kg)</option>
+        <option>Peso Meio-Pesado (−81kg)</option><option>Peso Pesado (+81kg)</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Equipe</label>
+      <select class="form-input" id="af-equipe">
+        <option value="">Sem Equipe</option>
+        <option>Chute Boxe Academy</option><option>Pitbull Brothers</option>
+        <option>Predadores Team</option><option>Dragão Team</option><option>Iron Fist Academy</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Vitórias</label><input class="form-input" type="number" id="af-wins" value="0"></div>
+      <div class="form-group"><label class="form-label">Derrotas</label><input class="form-input" type="number" id="af-losses" value="0"></div>
+      <div class="form-group"><label class="form-label">Empates</label><input class="form-input" type="number" id="af-draws" value="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Foto do Atleta (URL)</label><input class="form-input" id="af-foto" placeholder="https://..."></div>
+    <div class="form-group"><label class="form-label">Sobre o Atleta</label>
+      <textarea class="form-input" rows="3" id="af-bio" style="resize:vertical;" placeholder="Breve descrição..."></textarea>
+    </div>
+    <button class="btn btn-red" style="width:100%;padding:14px;font-size:14px;margin-top:8px;" onclick="addFighter()">Cadastrar Lutador</button>
+  </div>
+</div>
+
+<!-- MODAL ADD EVENT -->
+<div class="modal-overlay" id="modal-add-event">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-add-event')">✕</button>
+    <div class="modal-title">Cadastrar Evento</div>
+    <div class="form-group"><label class="form-label">Nome do Evento</label><input class="form-input" id="ae-name" placeholder="FightHub Championship 2025"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date" id="ae-date"></div>
+      <div class="form-group"><label class="form-label">Organização</label><input class="form-input" id="ae-org" placeholder="CBKB"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Cidade / Local</label><input class="form-input" id="ae-city" placeholder="São Paulo, SP — Ginásio do Ibirapuera"></div>
+    <div class="form-group"><label class="form-label">Número de Lutas</label><input class="form-input" type="number" id="ae-fights" value="8"></div>
+    <button class="btn btn-red" style="width:100%;padding:14px;font-size:14px;margin-top:8px;" onclick="addEvent()">Cadastrar Evento</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+// DATA
+// =============================================
+const FIGHTERS = [
+  { id:1, name:'Rafael Fiziev', nick:'"Ataman"', nat:'🇰🇿 Cazaquistão', div:'Peso Leve (−65kg)', dob:'1992-04-05', age:32, height:'175cm', weight:'65kg', team:'Pitbull Brothers', teamId:1, wins:11, losses:2, draws:0, rank:1, flag:'🇰🇿', bio:'Rafael Fiziev é um dos kickboxers mais explosivos da sua geração, conhecido por seus knockouts devastadores e movimentação ofensiva imprevisível. Domina o peso leve nacional desde 2022.', tags:['#1 Rank','Campeão Nacional','KO Specialist'] },
+  { id:2, name:'Bruno Machado', nick:'"The Machine"', nat:'🇧🇷 Brasil', div:'Peso Leve (−65kg)', dob:'1994-08-22', age:30, height:'172cm', weight:'64kg', team:'Chute Boxe Academy', teamId:2, wins:18, losses:3, draws:1, rank:2, flag:'🇧🇷', bio:'Bruno Machado é uma das maiores promessas do kickboxing brasileiro. Conhecido pelo volume de golpes e resistência física extraordinária.', tags:['#2 Rank','Top Contender'] },
+  { id:3, name:'Caio Borralho', nick:'"The Natural"', nat:'🇧🇷 Brasil', div:'Peso Médio (−75kg)', dob:'1995-03-10', age:29, height:'183cm', weight:'75kg', team:'Predadores Team', teamId:3, wins:14, losses:1, draws:0, rank:1, flag:'🇧🇷', bio:'Caio Borralho domina o peso médio com uma combinação devastadora de velocidade e potência técnica. Considerado um dos atletas mais completos do Brasil.', tags:['#1 Rank','Campeão Estadual','Invicto em 2024'] },
+  { id:4, name:'Marcus Santos', nick:'"Iron Fist"', nat:'🇧🇷 Brasil', div:'Peso Pesado (+81kg)', dob:'1990-11-15', age:34, height:'190cm', weight:'92kg', team:'Dragão Team', teamId:4, wins:22, losses:5, draws:2, rank:3, flag:'🇧🇷', bio:'Veterano do kickboxing nacional, Marcus Santos é reconhecido pela força explosiva e longa experiência em grandes palcos nacionais e internacionais.', tags:['Veterano','Top 5'] },
+  { id:5, name:'Ana Lima', nick:'"The Warrior"', nat:'🇧🇷 Brasil', div:'Peso Galo (−56kg)', dob:'1997-06-30', age:27, height:'162cm', weight:'55kg', team:'Iron Fist Academy', teamId:5, wins:9, losses:2, draws:0, rank:1, flag:'🇧🇷', bio:'Ana Lima é a principal lutadora feminina do kickboxing brasileiro, com atuações dominantes na categoria peso galo e três títulos nacionais.', tags:['#1 Rank','Feminino','Campeã Brasileira'] },
+  { id:6, name:'Diego Ferreira', nick:'"The Dragon"', nat:'🇧🇷 Brasil', div:'Peso Meio-Médio (−71kg)', dob:'1993-02-18', age:31, height:'178cm', weight:'70kg', team:'Chute Boxe Academy', teamId:2, wins:15, losses:4, draws:1, rank:2, flag:'🇧🇷', bio:'Diego Ferreira é um técnico completo que mistura potência e inteligência dentro do ringue. Especialista em contra-ataques.', tags:['#2 Rank','Counter Specialist'] },
+];
+
+const TEAMS = [
+  { id:1, name:'Pitbull Brothers', location:'Brasília, DF', emoji:'🐾', fighters:12, wins:87, titles:5, coach:'Roberto Nunes', founded:'2010', meta:'Academia especializada em Kickboxing e Muay Thai' },
+  { id:2, name:'Chute Boxe Academy', location:'Curitiba, PR', emoji:'🥊', fighters:24, wins:142, titles:11, coach:'Diego Lima', founded:'2005', meta:'Uma das mais tradicionais academias de artes marciais do Brasil' },
+  { id:3, name:'Predadores Team', location:'São Paulo, SP', emoji:'🐆', fighters:18, wins:98, titles:7, coach:'Carlos Mendes', founded:'2012', meta:'Formando campeões nacionais e internacionais' },
+  { id:4, name:'Dragão Team', location:'Rio de Janeiro, RJ', emoji:'🐉', fighters:15, wins:76, titles:4, coach:'Paulo Dragon', founded:'2008', meta:'Tradição e excelência no kickboxing carioca' },
+  { id:5, name:'Iron Fist Academy', location:'Belo Horizonte, MG', emoji:'👊', fighters:9, wins:54, titles:3, coach:'Fábio Iron', founded:'2015', meta:'Especialistas no desenvolvimento de atletas femininas e masculinas' },
+];
+
+const EVENTS = [
+  { id:1, name:'FightHub Grand Prix 2025', org:'FightHub', date:'2025-03-15', city:'São Paulo, SP', status:'upcoming', fights:10 },
+  { id:2, name:'Brazilian Kickboxing Championship', org:'CBKB', date:'2025-02-28', city:'Rio de Janeiro, RJ', status:'upcoming', fights:8 },
+  { id:3, name:'Copa Sul de Kickboxing', org:'FKRS', date:'2025-04-20', city:'Porto Alegre, RS', status:'upcoming', fights:12 },
+  { id:4, name:'SP Open Kickboxing', org:'FKESP', date:'2024-12-10', city:'São Paulo, SP', status:'past', fights:14 },
+  { id:5, name:'Rio Fight Night', org:'RFN Promotions', date:'2024-11-22', city:'Rio de Janeiro, RJ', status:'past', fights:9 },
+  { id:6, name:'Grand Slam Kickboxing', org:'CBKB', date:'2024-10-05', city:'Belo Horizonte, MG', status:'past', fights:11 },
+];
+
+const FIGHT_HISTORY = {
+  1: [
+    { result:'W', opp:'Luis Torres', method:'KO (Chute Circular)', event:'GP Kickboxing 2024', date:'Nov 2024', round:'R2 1:23' },
+    { result:'W', opp:'Carlos Smith', method:'Dec. Unânime', event:'Copa Brasil 2024', date:'Set 2024', round:'3R' },
+    { result:'L', opp:'Ivan Volkov', method:'KO (Direto)', event:'World Clash 2023', date:'Jun 2023', round:'R1 2:45' },
+    { result:'W', opp:'Bruno Costa', method:'TKO (Chutes)', event:'SP Open 2023', date:'Mar 2023', round:'R3' },
+    { result:'W', opp:'Marcos Tavares', method:'Dec. Unânime', event:'Copa BR 2022', date:'Dez 2022', round:'3R' },
+  ],
+  2: [
+    { result:'W', opp:'Felipe Neto', method:'TKO (Joelhada)', event:'FightHub GP 2024', date:'Dez 2024', round:'R2 2:10' },
+    { result:'W', opp:'Paulo Araújo', method:'Dec. Dividida', event:'Copa BR 2024', date:'Out 2024', round:'3R' },
+    { result:'W', opp:'Ricardo Melo', method:'KO (Combinação)', event:'SP Open 2024', date:'Jul 2024', round:'R1 0:58' },
+    { result:'L', opp:'Rafael Fiziev', method:'Dec. Unânime', event:'Grand Slam 2023', date:'Out 2023', round:'3R' },
+  ],
+};
+
+const RANKINGS_DATA = {
+  'Peso Pena (−60kg)': [
+    { name:'João Victor', team:'Pitbull Brothers', country:'🇧🇷 Brasil', w:16, l:1, last:'W' },
+    { name:'Carlos Moura', team:'SP Fight', country:'🇧🇷 Brasil', w:12, l:3, last:'W' },
+    { name:'Pierre Dubois', team:'French KB', country:'🇫🇷 França', w:14, l:4, last:'L' },
+    { name:'Tanapon Jitmuan', team:'Thailand Elite', country:'🇹🇭 Tailândia', w:18, l:5, last:'W' },
+    { name:'Diego Santos', team:'Dragão Team', country:'🇧🇷 Brasil', w:10, l:2, last:'W' },
+  ],
+  'Peso Leve (−65kg)': [
+    { name:'Rafael Fiziev', team:'Pitbull Brothers', country:'🇰🇿 Cazaquistão', w:11, l:2, last:'W' },
+    { name:'Bruno Machado', team:'Chute Boxe Academy', country:'🇧🇷 Brasil', w:18, l:3, last:'W' },
+    { name:'Jamal Hassan', team:'Dutch School', country:'🇳🇱 Holanda', w:15, l:4, last:'W' },
+    { name:'Pedro Alves', team:'Predadores', country:'🇧🇷 Brasil', w:9, l:2, last:'L' },
+    { name:'Michael Chen', team:'USA Kickboxing', country:'🇺🇸 EUA', w:11, l:3, last:'W' },
+  ],
+  'Peso Médio (−75kg)': [
+    { name:'Caio Borralho', team:'Predadores Team', country:'🇧🇷 Brasil', w:14, l:1, last:'W' },
+    { name:'Alexei Nikitin', team:'Russian Top Team', country:'🇷🇺 Rússia', w:17, l:3, last:'W' },
+    { name:'Fernando Costa', team:'Chute Boxe', country:'🇧🇷 Brasil', w:12, l:5, last:'L' },
+    { name:'Ahmed Al-Rashid', team:'Dubai KB', country:'🇦🇪 EAU', w:10, l:2, last:'W' },
+  ],
+  'Peso Meio-Médio (−71kg)': [
+    { name:'Diego Ferreira', team:'Chute Boxe Academy', country:'🇧🇷 Brasil', w:15, l:4, last:'W' },
+    { name:'Marcus Almeida', team:'Team SP', country:'🇧🇷 Brasil', w:13, l:2, last:'W' },
+    { name:'Kiro Tanaka', team:'Japan Elite', country:'🇯🇵 Japão', w:12, l:3, last:'L' },
+  ],
+  'Peso Pesado (+81kg)': [
+    { name:'Marcus Santos', team:'Dragão Team', country:'🇧🇷 Brasil', w:22, l:5, last:'W' },
+    { name:'Artem Vovchanchyn', team:'UA Strong', country:'🇺🇦 Ucrânia', w:19, l:4, last:'W' },
+    { name:'Roberto Biggão', team:'RJ Fight', country:'🇧🇷 Brasil', w:14, l:8, last:'W' },
+  ],
+  'Peso Galo (−56kg)': [
+    { name:'Ana Lima', team:'Iron Fist Academy', country:'🇧🇷 Brasil', w:9, l:2, last:'W' },
+    { name:'Keiko Tanaka', team:'Japan Kick', country:'🇯🇵 Japão', w:11, l:3, last:'W' },
+    { name:'Sofia Mendez', team:'Arg KB', country:'🇦🇷 Argentina', w:8, l:2, last:'L' },
+  ],
+  'Peso Meio-Pesado (−81kg)': [
+    { name:'Lucas Brito', team:'SP Power', country:'🇧🇷 Brasil', w:13, l:2, last:'W' },
+    { name:'Dmitri Volkov', team:'Russia KB', country:'🇷🇺 Rússia', w:15, l:4, last:'W' },
+    { name:'Felipe Guerra', team:'Predadores', country:'🇧🇷 Brasil', w:10, l:3, last:'W' },
+  ],
+  'Peso Mosca (−52kg)': [
+    { name:'Rafinha Speed', team:'BH Kicks', country:'🇧🇷 Brasil', w:12, l:1, last:'W' },
+    { name:'Leo Ágil', team:'Curitiba KB', country:'🇧🇷 Brasil', w:10, l:2, last:'W' },
+    { name:'Chang Wei', team:'China Elite', country:'🇨🇳 China', w:14, l:3, last:'L' },
+  ],
+};
+
+// =============================================
+// STATE
+// =============================================
+let currentUser = null;
+let activeFighterId = null;
+let activeTeamId = null;
+
+// =============================================
+// AUTH
+// =============================================
+function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-password').value;
+  if (!email || !pass) { showToast('Preencha todos os campos', true); return; }
+  currentUser = { name: email.split('@')[0], email };
+  updateAuthUI();
+  showPage('home');
+  showToast('Bem-vindo de volta, ' + currentUser.name + '!');
+}
+
+function doRegister() {
+  const fname = document.getElementById('reg-fname').value;
+  const lname = document.getElementById('reg-lname').value;
+  const email = document.getElementById('reg-email').value;
+  const pass = document.getElementById('reg-password').value;
+  const pass2 = document.getElementById('reg-password2').value;
+  if (!fname || !lname || !email || !pass) { showToast('Preencha todos os campos', true); return; }
+  if (pass !== pass2) { showToast('As senhas não coincidem', true); return; }
+  if (pass.length < 8) { showToast('Senha deve ter mínimo 8 caracteres', true); return; }
+  currentUser = { name: fname, email };
+  updateAuthUI();
+  showPage('home');
+  showToast('Conta criada! Bem-vindo ao FightHub, ' + fname + '!');
+}
+
+function logout() {
+  currentUser = null;
+  updateAuthUI();
+  showPage('home');
+  showToast('Você saiu da conta.');
+}
+
+function updateAuthUI() {
+  document.getElementById('nav-auth').style.display = currentUser ? 'none' : 'flex';
+  document.getElementById('nav-user').style.display = currentUser ? 'flex' : 'none';
+  if (currentUser) document.getElementById('user-greeting').textContent = currentUser.name;
+}
+
+function requireAuth(feature) {
+  if (!currentUser) { showToast('Faça login para usar: ' + feature, true); showPage('login'); return; }
+  showToast(feature + ' — funcionalidade em desenvolvimento!');
+}
+
+// =============================================
+// NAVIGATION
+// =============================================
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + pageId);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.dataset.page === pageId));
+  window.scrollTo(0, 0);
+  if (pageId === 'home') renderHome();
+  if (pageId === 'fighters') renderFighters();
+  if (pageId === 'teams') renderTeams();
+  if (pageId === 'events') renderEventsList('upcoming');
+  if (pageId === 'rankings') renderRankings('Peso Pena (−60kg)');
+}
+
+// =============================================
+// HOME
+// =============================================
+function renderHome() {
+  document.getElementById('stat-fighters').textContent = FIGHTERS.length.toLocaleString('pt-BR');
+  document.getElementById('stat-teams').textContent = TEAMS.length.toLocaleString('pt-BR');
+  document.getElementById('home-fighters').innerHTML = FIGHTERS.slice(0,6).map(fighterCardHTML).join('');
+  document.getElementById('home-events').innerHTML = EVENTS.filter(e=>e.status==='upcoming').slice(0,3).map(eventItemHTML).join('');
+  document.getElementById('home-teams').innerHTML = TEAMS.slice(0,4).map(teamCardHTML).join('');
+}
+
+// =============================================
+// FIGHTER CARDS HTML
+// =============================================
+function fighterCardHTML(f) {
+  return `<div class="fighter-card" onclick="showFighterProfile(${f.id})">
+    <div class="fighter-card-img" style="background:var(--dark3);">
+      ${f.rank ? `<div class="fighter-rank">#${f.rank}</div>` : ''}
+      <span style="font-size:70px;opacity:0.12;position:absolute;">${f.flag||'🥊'}</span>
+      <span style="font-size:60px;z-index:1;">🥊</span>
+    </div>
+    <div class="fighter-card-body">
+      <div class="fighter-name">${f.name}</div>
+      <div class="fighter-nick">${f.nick}</div>
+      <div class="fighter-meta">${f.div.split('(')[0].trim()} · ${f.team||'Sem Equipe'}</div>
+      <div class="fighter-record">
+        <span class="rec-w">${f.wins}V</span>
+        <span style="color:var(--dark4)"> – </span>
+        <span class="rec-l">${f.losses}D</span>
+        <span style="color:var(--dark4)"> – </span>
+        <span class="rec-d">${f.draws}E</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// =============================================
+// EVENT HTML
+// =============================================
+function eventItemHTML(e) {
+  const d = new Date(e.date + 'T12:00:00');
+  const months = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  const statusClass = {upcoming:'status-upcoming',past:'status-results',live:'status-live'}[e.status]||'';
+  const statusLabel = {upcoming:'Próximo',past:'Resultados',live:'AO VIVO'}[e.status]||'';
+  return `<div class="event-item" onclick="showPage('events')">
+    <div class="event-date">
+      <div class="month">${months[d.getMonth()]}</div>
+      <div class="day">${d.getDate()}</div>
+      <div class="year">${d.getFullYear()}</div>
+    </div>
+    <div>
+      <div class="event-name">${e.name}</div>
+      <div class="event-org">${e.org}</div>
+      <div class="event-location">📍 ${e.city} · ${e.fights} lutas</div>
+    </div>
+    <div class="event-status ${statusClass}">${statusLabel}</div>
+  </div>`;
+}
+
+// =============================================
+// TEAM HTML
+// =============================================
+function teamCardHTML(t) {
+  return `<div class="team-card" onclick="showTeamProfile(${t.id})">
+    <div class="team-logo">${t.emoji}</div>
+    <div>
+      <div class="team-name">${t.name}</div>
+      <div class="team-location">📍 ${t.location}</div>
+      <div style="font-size:12px;color:var(--gray-light);margin-top:4px;">${t.meta}</div>
+      <div class="team-stats">
+        <div><div class="team-stat-val">${t.fighters}</div><div class="team-stat-lbl">Atletas</div></div>
+        <div><div class="team-stat-val">${t.wins}</div><div class="team-stat-lbl">Vitórias</div></div>
+        <div><div class="team-stat-val">${t.titles}</div><div class="team-stat-lbl">Títulos</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// =============================================
+// FIGHTERS PAGE
+// =============================================
+function renderFighters(list) {
+  const fighters = list || FIGHTERS;
+  document.getElementById('fighters-grid').innerHTML = fighters.map(fighterCardHTML).join('') ||
+    '<div style="color:var(--gray-light);padding:24px;">Nenhum lutador encontrado.</div>';
+  document.getElementById('fighters-count').textContent = fighters.length + ' lutador(es) encontrado(s)';
+}
+
+function filterFighters() {
+  const q = document.getElementById('fighters-search').value.toLowerCase();
+  const div = document.getElementById('fighters-division').value;
+  renderFighters(FIGHTERS.filter(f =>
+    (!q || f.name.toLowerCase().includes(q) || f.nick.toLowerCase().includes(q) || (f.team||'').toLowerCase().includes(q)) &&
+    (!div || f.div === div)
+  ));
+}
+
+// =============================================
+// FIGHTER PROFILE
+// =============================================
+function showFighterProfile(id) {
+  const f = FIGHTERS.find(x => x.id === id);
+  if (!f) return;
+  activeFighterId = id;
+  document.getElementById('profile-breadcrumb').textContent = f.name;
+  document.getElementById('profile-flag').textContent = f.flag||'🌍';
+  document.getElementById('profile-division-tag').textContent = f.div.split('(')[0].trim();
+  document.getElementById('profile-name').textContent = f.name;
+  document.getElementById('profile-nick').textContent = f.nick;
+  document.getElementById('profile-w').textContent = f.wins;
+  document.getElementById('profile-l').textContent = f.losses;
+  document.getElementById('profile-d').textContent = f.draws;
+  document.getElementById('pi-dob').textContent = f.dob || '—';
+  document.getElementById('pi-age').textContent = f.age ? f.age + ' anos' : '—';
+  document.getElementById('pi-nat').textContent = f.nat || '—';
+  document.getElementById('pi-height').textContent = f.height || '—';
+  document.getElementById('pi-weight').textContent = f.weight || '—';
+  const teamEl = document.getElementById('pi-team');
+  teamEl.textContent = f.team || 'Sem Equipe';
+  teamEl.style.cursor = f.teamId ? 'pointer' : 'default';
+  teamEl.style.color = f.teamId ? 'var(--red)' : 'var(--white)';
+  document.getElementById('profile-tags').innerHTML = (f.tags||[]).map(t =>
+    `<div class="tag ${t.includes('#1')?'red':''}">${t}</div>`).join('');
+  // fights
+  const fights = FIGHT_HISTORY[id] || [];
+  document.getElementById('fight-history').innerHTML = fights.length
+    ? fights.map(fh => `<div class="fight-row">
+        <div class="fight-result ${fh.result}">${fh.result === 'W' ? 'VITÓRIA' : fh.result === 'L' ? 'DERROTA' : 'EMPATE'}</div>
+        <div><div class="fight-opponent">${fh.opp}</div></div>
+        <div style="font-size:12px;color:var(--gray-light);">${fh.round}</div>
+        <div><div class="fight-method">${fh.method}</div></div>
+        <div class="fight-event">${fh.event}</div>
+        <div class="fight-date">${fh.date}</div>
+      </div>`).join('')
+    : '<div style="padding:24px 20px;color:var(--gray-light);font-size:14px;">Nenhuma luta registrada.</div>';
+  // stats
+  const total = f.wins + f.losses + f.draws;
+  document.getElementById('stats-grid').innerHTML = [
+    {val:total, lbl:'Total de Lutas'},
+    {val:f.wins, lbl:'Vitórias'},
+    {val:f.losses, lbl:'Derrotas'},
+    {val:f.draws, lbl:'Empates'},
+    {val: total > 0 ? Math.round(f.wins/total*100)+'%' : '—', lbl:'% Vitórias'},
+    {val:'—', lbl:'KOs / TKOs'},
+  ].map(s => `<div style="background:var(--dark2);border:1px solid var(--dark4);padding:20px;">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--white);line-height:1;">${s.val}</div>
+    <div style="font-size:11px;color:var(--gray-light);text-transform:uppercase;letter-spacing:1px;margin-top:4px;">${s.lbl}</div>
+  </div>`).join('');
+  document.getElementById('about-text').textContent = f.bio || 'Sem informações adicionais.';
+  // reset tabs
+  document.querySelectorAll('#page-fighter-profile .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#page-fighter-profile .tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('#page-fighter-profile .tab-btn')[0].classList.add('active');
+  document.getElementById('tab-fights').classList.add('active');
+  showPage('fighter-profile');
+}
+
+function goToTeam() {
+  const f = FIGHTERS.find(x => x.id === activeFighterId);
+  if (f && f.teamId) showTeamProfile(f.teamId);
+}
+
+function switchTab(e, tabId) {
+  const page = e.target.closest('.page');
+  page.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  page.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// =============================================
+// TEAMS PAGE
+// =============================================
+function renderTeams(list) {
+  document.getElementById('teams-grid').innerHTML = (list || TEAMS).map(teamCardHTML).join('');
+}
+
+function filterTeams() {
+  const q = document.getElementById('teams-search').value.toLowerCase();
+  renderTeams(!q ? TEAMS : TEAMS.filter(t => t.name.toLowerCase().includes(q) || t.location.toLowerCase().includes(q)));
+}
+
+function showTeamProfile(id) {
+  const t = TEAMS.find(x => x.id === id);
+  if (!t) return;
+  activeTeamId = id;
+  document.getElementById('team-breadcrumb').textContent = t.name;
+  document.getElementById('team-profile-logo').textContent = t.emoji;
+  document.getElementById('team-profile-name').textContent = t.name;
+  document.getElementById('team-profile-location').textContent = '📍 ' + t.location;
+  document.getElementById('team-profile-meta').textContent = `Treinador: ${t.coach} · Fundada em ${t.founded} · ${t.meta}`;
+  document.getElementById('tp-fighters').textContent = t.fighters;
+  document.getElementById('tp-wins').textContent = t.wins;
+  document.getElementById('tp-titles').textContent = t.titles;
+  const teamFighters = FIGHTERS.filter(f => f.teamId === id);
+  document.getElementById('team-fighters-grid').innerHTML = teamFighters.length
+    ? teamFighters.map(fighterCardHTML).join('')
+    : '<div style="color:var(--gray-light);font-size:14px;padding:16px 0;">Nenhum lutador cadastrado nesta equipe.</div>';
+  showPage('team-profile');
+}
+
+// =============================================
+// EVENTS PAGE
+// =============================================
+function renderEventsList(filter) {
+  const list = filter === 'all' ? EVENTS :
+    filter === 'past' ? EVENTS.filter(e => e.status === 'past') :
+    EVENTS.filter(e => e.status !== 'past');
+  document.getElementById('events-list').innerHTML = list.length
+    ? list.map(eventItemHTML).join('')
+    : '<div style="color:var(--gray-light);padding:16px;">Nenhum evento encontrado.</div>';
+}
+
+function switchEventsTab(e, filter) {
+  document.querySelectorAll('#page-events .tab-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderEventsList(filter);
+}
+
+// =============================================
+// RANKINGS
+// =============================================
+function renderRankings(wc) {
+  document.getElementById('ranking-wc-title').textContent = wc;
+  const list = RANKINGS_DATA[wc] || [];
+  document.getElementById('ranking-body').innerHTML = list.map((r,i) => `
+    <tr onclick="showPage('fighters')">
+      <td class="rank-num ${i<3?'top3':''}">${i+1}</td>
+      <td><span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--white);">${r.name}</span></td>
+      <td style="font-size:13px;color:var(--gray-light);">${r.team}</td>
+      <td style="font-size:13px;">${r.country}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#4CAF50;">${r.w}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--red);">${r.l}</td>
+      <td><span class="chip ${r.last==='W'?'gold':''}">${r.last==='W'?'✓ Vitória':'✗ Derrota'}</span></td>
+    </tr>`).join('');
+}
+
+function selectWC(el, wc) {
+  document.querySelectorAll('.wc-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRankings(wc);
+}
+
+// =============================================
+// MODALS
+// =============================================
+function openModal(id) {
+  if (!currentUser) { showToast('Faça login para continuar', true); showPage('login'); return; }
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+});
+
+function addFighter() {
+  const nome = document.getElementById('af-nome').value.trim();
+  const sobrenome = document.getElementById('af-sobrenome').value.trim();
+  if (!nome || !sobrenome) { showToast('Preencha nome e sobrenome', true); return; }
+  const newF = {
+    id: FIGHTERS.length + 1,
+    name: nome + ' ' + sobrenome,
+    nick: '"' + (document.getElementById('af-apelido').value.trim() || 'Fighter') + '"',
+    nat: '🇧🇷 ' + (document.getElementById('af-nat').value || 'Brasil'),
+    div: document.getElementById('af-cat').value,
+    dob: document.getElementById('af-dob').value || '—',
+    age: '—',
+    height: (document.getElementById('af-altura').value || '—') + 'cm',
+    weight: (document.getElementById('af-peso').value || '—') + 'kg',
+    team: document.getElementById('af-equipe').value || 'Sem Equipe',
+    teamId: null, rank: null, flag: '🇧🇷',
+    wins: parseInt(document.getElementById('af-wins').value)||0,
+    losses: parseInt(document.getElementById('af-losses').value)||0,
+    draws: parseInt(document.getElementById('af-draws').value)||0,
+    bio: document.getElementById('af-bio').value || 'Sem descrição.',
+    tags: [],
+  };
+  FIGHTERS.push(newF);
+  closeModal('modal-add-fighter');
+  showToast(newF.name + ' cadastrado com sucesso!');
+  ['af-nome','af-sobrenome','af-apelido','af-nat','af-altura','af-peso','af-bio'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('af-wins').value = '0';
+  document.getElementById('af-losses').value = '0';
+  document.getElementById('af-draws').value = '0';
+  showPage('fighters');
+}
+
+function addEvent() {
+  const name = document.getElementById('ae-name').value.trim();
+  const date = document.getElementById('ae-date').value;
+  const org = document.getElementById('ae-org').value.trim();
+  const city = document.getElementById('ae-city').value.trim();
+  if (!name || !date) { showToast('Preencha nome e data do evento', true); return; }
+  EVENTS.unshift({
+    id: EVENTS.length + 1, name, org: org||'—', date, city: city||'—',
+    status: new Date(date) > new Date() ? 'upcoming' : 'past',
+    fights: parseInt(document.getElementById('ae-fights').value)||8
+  });
+  closeModal('modal-add-event');
+  showToast('Evento "' + name + '" cadastrado!');
+  showPage('events');
+}
+
+// =============================================
+// TOAST
+// =============================================
+function showToast(msg, error = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (error ? ' error' : '');
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// =============================================
+// INIT
+// =============================================
+renderHome();
+renderRankings('Peso Pena (−60kg)');
+</script>
+</body>
+</html>
