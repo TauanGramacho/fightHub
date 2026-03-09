@@ -659,6 +659,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="supabase-config.js"></script>
 <script>
 // =============================================
 // DATA
@@ -759,6 +760,52 @@ const RANKINGS_DATA = {
 let currentUser = null;
 let activeFighterId = null;
 let activeTeamId = null;
+
+// =============================================
+// SUPABASE – lutadores no banco
+// =============================================
+function mapRowToFighter(row) {
+  return {
+    id: row.id,
+    name: row.name || '—',
+    nick: row.nick || '"Fighter"',
+    nat: row.nationality || '—',
+    div: row.division || '—',
+    dob: row.dob || '—',
+    age: row.age || null,
+    height: row.height_cm ? row.height_cm + 'cm' : '—',
+    weight: row.weight_kg ? row.weight_kg + 'kg' : '—',
+    team: row.team || 'Sem Equipe',
+    teamId: row.team_id || null,
+    wins: row.wins || 0,
+    losses: row.losses || 0,
+    draws: row.draws || 0,
+    rank: row.rank || null,
+    flag: row.flag || '🇧🇷',
+    bio: row.bio || '',
+    tags: Array.isArray(row.tags) ? row.tags : [],
+  };
+}
+
+window.loadFightersFromSupabase = async function () {
+  if (!window.supabase) return;
+  const { data, error } = await window.supabase.from('fighters').select('*').order('id', { ascending: true });
+  if (error) {
+    console.error('Supabase fighters load:', error);
+    showToast('Erro ao carregar lutadores: ' + error.message, true);
+    return;
+  }
+  if (data && data.length > 0) {
+    FIGHTERS.length = 0;
+    FIGHTERS.push(...data.map(mapRowToFighter));
+  }
+  renderHome();
+  if (document.getElementById('page-fighters').classList.contains('active')) renderFighters();
+};
+
+document.addEventListener('supabaseReady', function () {
+  if (window.loadFightersFromSupabase) window.loadFightersFromSupabase();
+});
 
 // =============================================
 // AUTH
@@ -1085,32 +1132,52 @@ function addFighter() {
   const nome = document.getElementById('af-nome').value.trim();
   const sobrenome = document.getElementById('af-sobrenome').value.trim();
   if (!nome || !sobrenome) { showToast('Preencha nome e sobrenome', true); return; }
-  const newF = {
-    id: FIGHTERS.length + 1,
-    name: nome + ' ' + sobrenome,
-    nick: '"' + (document.getElementById('af-apelido').value.trim() || 'Fighter') + '"',
-    nat: '🇧🇷 ' + (document.getElementById('af-nat').value || 'Brasil'),
-    div: document.getElementById('af-cat').value,
-    dob: document.getElementById('af-dob').value || '—',
-    age: '—',
-    height: (document.getElementById('af-altura').value || '—') + 'cm',
-    weight: (document.getElementById('af-peso').value || '—') + 'kg',
-    team: document.getElementById('af-equipe').value || 'Sem Equipe',
-    teamId: null, rank: null, flag: '🇧🇷',
-    wins: parseInt(document.getElementById('af-wins').value)||0,
-    losses: parseInt(document.getElementById('af-losses').value)||0,
-    draws: parseInt(document.getElementById('af-draws').value)||0,
-    bio: document.getElementById('af-bio').value || 'Sem descrição.',
-    tags: [],
+  const fullName = nome + ' ' + sobrenome;
+  const apelido = document.getElementById('af-apelido').value.trim();
+  const nick = '"' + (apelido || 'Fighter') + '"';
+  const nat = document.getElementById('af-nat').value.trim();
+  const nationality = nat ? '🇧🇷 ' + nat : '🇧🇷 Brasil';
+  const payload = {
+    first_name: nome,
+    last_name: sobrenome,
+    name: fullName,
+    nick: nick,
+    nationality: nationality,
+    division: document.getElementById('af-cat').value,
+    dob: document.getElementById('af-dob').value || null,
+    height_cm: parseInt(document.getElementById('af-altura').value, 10) || null,
+    weight_kg: parseInt(document.getElementById('af-peso').value, 10) || null,
+    team: document.getElementById('af-equipe').value || null,
+    team_id: null,
+    wins: parseInt(document.getElementById('af-wins').value, 10) || 0,
+    losses: parseInt(document.getElementById('af-losses').value, 10) || 0,
+    draws: parseInt(document.getElementById('af-draws').value, 10) || 0,
+    flag: '🇧🇷',
+    bio: document.getElementById('af-bio').value.trim() || null,
+    photo_url: document.getElementById('af-foto').value.trim() || null,
   };
-  FIGHTERS.push(newF);
-  closeModal('modal-add-fighter');
-  showToast(newF.name + ' cadastrado com sucesso!');
-  ['af-nome','af-sobrenome','af-apelido','af-nat','af-altura','af-peso','af-bio'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('af-wins').value = '0';
-  document.getElementById('af-losses').value = '0';
-  document.getElementById('af-draws').value = '0';
-  showPage('fighters');
+  if (!window.supabase) {
+    const newF = { id: FIGHTERS.length + 1, name: fullName, nick, nat: nationality, div: payload.division, dob: payload.dob || '—', age: '—', height: payload.height_cm ? payload.height_cm + 'cm' : '—', weight: payload.weight_kg ? payload.weight_kg + 'kg' : '—', team: payload.team || 'Sem Equipe', teamId: null, rank: null, flag: '🇧🇷', wins: payload.wins, losses: payload.losses, draws: payload.draws, bio: payload.bio || 'Sem descrição.', tags: [] };
+    FIGHTERS.push(newF);
+    closeModal('modal-add-fighter');
+    showToast(newF.name + ' cadastrado (sem banco)!');
+    ['af-nome','af-sobrenome','af-apelido','af-nat','af-altura','af-peso','af-bio','af-foto'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('af-wins').value = '0'; document.getElementById('af-losses').value = '0'; document.getElementById('af-draws').value = '0';
+    showPage('fighters');
+    return;
+  }
+  window.supabase.from('fighters').insert(payload).select('*').single().then(function (result) {
+    if (result.error) {
+      showToast('Erro ao cadastrar: ' + result.error.message, true);
+      return;
+    }
+    closeModal('modal-add-fighter');
+    showToast(fullName + ' cadastrado com sucesso no banco!');
+    ['af-nome','af-sobrenome','af-apelido','af-nat','af-altura','af-peso','af-bio','af-foto'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('af-wins').value = '0'; document.getElementById('af-losses').value = '0'; document.getElementById('af-draws').value = '0';
+    if (window.loadFightersFromSupabase) window.loadFightersFromSupabase();
+    showPage('fighters');
+  });
 }
 
 function addEvent() {
@@ -1145,6 +1212,17 @@ function showToast(msg, error = false) {
 // =============================================
 renderHome();
 renderRankings('Peso Pena (−60kg)');
+</script>
+<script type="module">
+  (function () {
+    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) return;
+    import('https://esm.sh/@supabase/supabase-js@2').then(function (mod) {
+      window.supabase = mod.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      document.dispatchEvent(new CustomEvent('supabaseReady'));
+    }).catch(function (e) {
+      console.error('Supabase load error:', e);
+    });
+  })();
 </script>
 </body>
 </html>
