@@ -1,0 +1,130 @@
+﻿
+// =============================================
+// HOME
+// =============================================
+function renderHome() {
+  document.getElementById('stat-fighters').textContent = FIGHTERS.length.toLocaleString('pt-BR');
+  document.getElementById('stat-teams').textContent = TEAMS.length.toLocaleString('pt-BR');
+  document.getElementById('home-fighters').innerHTML = FIGHTERS.slice(0,6).map(fighterCardHTML).join('');
+  document.getElementById('home-events').innerHTML = EVENTS.filter(e=>e.status==='upcoming').slice(0,3).map(eventItemHTML).join('');
+  document.getElementById('home-teams').innerHTML = TEAMS.slice(0,4).map(teamCardHTML).join('');
+}
+
+// =============================================
+// FIGHTER CARDS HTML
+// =============================================
+function fighterCardHTML(f) {
+  return `<div class="fighter-card" onclick="showFighterProfile(${f.id})">
+    <div class="fighter-card-img" style="background:var(--dark3);">
+      ${f.rank ? `<div class="fighter-rank">#${f.rank}</div>` : ''}
+      <span style="font-size:70px;opacity:0.12;position:absolute;">${f.flag||'­ƒÑè'}</span>
+      <span style="font-size:60px;z-index:1;">­ƒÑè</span>
+    </div>
+    <div class="fighter-card-body">
+      <div class="fighter-name">${f.name}</div>
+      <div class="fighter-nick">${f.nick}</div>
+      <div class="fighter-meta">${f.div.split('(')[0].trim()} ┬À ${f.team||'Sem Equipe'}</div>
+      <div class="fighter-record">
+        <span class="rec-w">${f.wins}V</span>
+        <span style="color:var(--dark4)"> ÔÇô </span>
+        <span class="rec-l">${f.losses}D</span>
+        <span style="color:var(--dark4)"> ÔÇô </span>
+        <span class="rec-d">${f.draws}E</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// =============================================
+// EVENT HTML
+// =============================================
+function eventItemHTML(e) {
+  const d = new Date(e.date + 'T12:00:00');
+  const months = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  const statusClass = {upcoming:'status-upcoming',past:'status-results',live:'status-live'}[e.status]||'';
+  const statusLabel = {upcoming:'Pr├│ximo',past:'Resultados',live:'AO VIVO'}[e.status]||'';
+  return `<div class="event-item" onclick="showPage('events')">
+    <div class="event-date">
+      <div class="month">${months[d.getMonth()]}</div>
+      <div class="day">${d.getDate()}</div>
+      <div class="year">${d.getFullYear()}</div>
+    </div>
+    <div>
+      <div class="event-name">${e.name}</div>
+      <div class="event-org">${e.org}</div>
+      <div class="event-location">­ƒôì ${e.city} ┬À ${e.fights} lutas</div>
+    </div>
+    <div class="event-status ${statusClass}">${statusLabel}</div>
+  </div>`;
+}
+
+// =============================================
+// TEAM HTML
+// =============================================
+function teamCardHTML(t) {
+  return `<div class="team-card" onclick="showTeamProfile(${t.id})">
+    <div class="team-logo">${t.emoji}</div>
+    <div>
+      <div class="team-name">${t.name}</div>
+      <div class="team-location">­ƒôì ${t.location}</div>
+      <div style="font-size:12px;color:var(--gray-light);margin-top:4px;">${t.meta}</div>
+      <div class="team-stats">
+        <div><div class="team-stat-val">${t.fighters}</div><div class="team-stat-lbl">Atletas</div></div>
+        <div><div class="team-stat-val">${t.wins}</div><div class="team-stat-lbl">Vit├│rias</div></div>
+        <div><div class="team-stat-val">${t.titles}</div><div class="team-stat-lbl">T├¡tulos</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// =============================================
+// FIGHTERS PAGE
+// =============================================
+function renderFighters(list) {
+  const fighters = list || FIGHTERS;
+  document.getElementById('fighters-grid').innerHTML = fighters.map(fighterCardHTML).join('') ||
+    '<div style="color:var(--gray-light);padding:24px;">Nenhum lutador encontrado.</div>';
+  document.getElementById('fighters-count').textContent = fighters.length + ' lutador(es) encontrado(s)';
+}
+
+function filterFighters() {
+  const q = document.getElementById('fighters-search').value.toLowerCase();
+  const div = document.getElementById('fighters-division').value;
+  renderFighters(FIGHTERS.filter(f =>
+    (!q || f.name.toLowerCase().includes(q) || f.nick.toLowerCase().includes(q) || (f.team||'').toLowerCase().includes(q)) &&
+    (!div || f.div === div)
+  ));
+}
+
+// =============================================
+// FIGHTER PROFILE
+// =============================================
+function showFighterProfile(id) {
+  const f = FIGHTERS.find(x => x.id === id);
+  if (!f) return;
+  activeFighterId = id;
+  document.getElementById('profile-breadcrumb').textContent = f.name;
+  document.getElementById('profile-flag').textContent = f.flag||'­ƒîì';
+  document.getElementById('profile-division-tag').textContent = f.div.split('(')[0].trim();
+  document.getElementById('profile-name').textContent = f.name;
+  document.getElementById('profile-nick').textContent = f.nick;
+  document.getElementById('profile-w').textContent = f.wins;
+  document.getElementById('profile-l').textContent = f.losses;
+  document.getElementById('profile-d').textContent = f.draws;
+  document.getElementById('pi-dob').textContent = f.dob || 'ÔÇö';
+  document.getElementById('pi-age').textContent = f.age ? f.age + ' anos' : 'ÔÇö';
+  document.getElementById('pi-nat').textContent = f.nat || 'ÔÇö';
+  document.getElementById('pi-height').textContent = f.height || 'ÔÇö';
+  document.getElementById('pi-weight').textContent = f.weight || 'ÔÇö';
+  const teamEl = document.getElementById('pi-team');
+  teamEl.textContent = f.team || 'Sem Equipe';
+  teamEl.style.cursor = f.teamId ? 'pointer' : 'default';
+  teamEl.style.color = f.teamId ? 'var(--red)' : 'var(--white)';
+  document.getElementById('profile-tags').innerHTML = (f.tags||[]).map(t =>
+    `<div class="tag ${t.includes('#1')?'red':''}">${t}</div>`).join('');
+  // fights
+  const fights = FIGHT_HISTORY[id] || [];
+  document.getElementById('fight-history').innerHTML = fights.length
+    ? fights.map(fh => `<div class="fight-row">
+        <div class="fight-result ${fh.result}">${fh.result === 'W' ? 'VIT├ôRIA' : fh.result === 'L' ? 'DERROTA' : 'EMPATE'}</div>
+        <div><div class="fight-opponent">${fh.opp}</div></div>
