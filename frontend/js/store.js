@@ -187,11 +187,18 @@ export async function loadEventsFromSupabase() {
 
 export async function loadRankingsFromSupabase() {
   if (!window.supabase) return;
-  const { data, error } = await window.supabase.from('rankings').select('*').order('position', { ascending: true });
-  if (!error && data) {
-    // Organiza por categoria no objeto RANKINGS_DATA
-    const grouped = {};
-    data.forEach(r => {
+  
+  // 1. Busca da tabela oficial de rankings
+  const { data: rankTable, error: err1 } = await window.supabase.from('rankings').select('*').order('position', { ascending: true });
+  
+  // 2. Busca da tabela de lutadores (quem tem rank atribuído)
+  const { data: fightersTable, error: err2 } = await window.supabase.from('fighters').select('*').not('rank', 'is', null).order('rank', { ascending: true });
+
+  const grouped = {};
+
+  // Processa tabela oficial (Rankings)
+  if (!err1 && rankTable) {
+    rankTable.forEach(r => {
       const wc = r.weight_class;
       if (!grouped[wc]) grouped[wc] = [];
       grouped[wc].push({
@@ -200,14 +207,43 @@ export async function loadRankingsFromSupabase() {
         country: r.country || '—',
         w: r.wins || 0,
         l: r.losses || 0,
-        last: r.last_result || '—'
+        last: r.last_result || '—',
+        pos: r.position
       });
     });
-    
-    // Limpa e atualiza o objeto global
-    Object.keys(RANKINGS_DATA).forEach(k => delete RANKINGS_DATA[k]);
-    Object.assign(RANKINGS_DATA, grouped);
   }
+
+  // Processa lutadores ranqueados (Híbrido)
+  if (!err2 && fightersTable) {
+    fightersTable.forEach(f => {
+      const wc = f.division;
+      if (!wc) return;
+      if (!grouped[wc]) grouped[wc] = [];
+      
+      // Evita duplicatas se já estiver na tabela de rankings pelo nome
+      const exists = grouped[wc].some(x => x.name.toLowerCase() === f.name.toLowerCase());
+      if (!exists) {
+        grouped[wc].push({
+          name: f.name,
+          team: f.team || '—',
+          country: f.nationality || '—',
+          w: f.wins || 0,
+          l: f.losses || 0,
+          last: '—', // Poderia puxar do histórico futuramente
+          pos: f.rank
+        });
+      }
+    });
+  }
+
+  // Ordena cada categoria pela posição/rank
+  Object.keys(grouped).forEach(cat => {
+    grouped[cat].sort((a, b) => (a.pos || 99) - (b.pos || 99));
+  });
+
+  // Limpa e atualiza o objeto global
+  Object.keys(RANKINGS_DATA).forEach(k => delete RANKINGS_DATA[k]);
+  Object.assign(RANKINGS_DATA, grouped);
 }
 
 document.addEventListener('supabaseReady', async function () {
