@@ -100,6 +100,32 @@ window.renderTeamsList = function() {
   if(grid) grid.innerHTML = TEAMS.map(globals.teamCardHTML).join('');
 }
 
+window.renderRankings = function(wc) {
+  const category = wc || 'Peso Pena (−60kg)';
+  const data = RANKINGS_DATA[category] || [];
+  const body = document.getElementById('ranking-body');
+  const title = document.getElementById('ranking-wc-title');
+  
+  if (title) title.textContent = category;
+  if (body) {
+    if (data.length === 0) {
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-light);">Sem dados para esta categoria.</td></tr>';
+    } else {
+      body.innerHTML = data.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="color:var(--white);font-weight:600;">${r.name}</td>
+          <td>${r.team}</td>
+          <td>${r.country}</td>
+          <td>${r.w}</td>
+          <td>${r.l}</td>
+          <td><span class="res-badge ${r.last}">${r.last}</span></td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
 // ... Additional helper/render functions might be needed later
 
 function initApp() {
@@ -127,6 +153,7 @@ function showPage(pageId) {
     if (pageId === 'fighters') window.renderFightersList();
     if (pageId === 'teams') window.renderTeamsList();
     if (pageId === 'events') window.renderEventsList();
+    if (pageId === 'rankings') window.renderRankings();
     
     // For profiles, we need a separate hook parameter based on click, 
     // which should be handled by window.showFighterProfile() etc.

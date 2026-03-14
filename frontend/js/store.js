@@ -185,14 +185,46 @@ export async function loadEventsFromSupabase() {
   }
 }
 
+export async function loadRankingsFromSupabase() {
+  if (!window.supabase) return;
+  const { data, error } = await window.supabase.from('rankings').select('*').order('position', { ascending: true });
+  if (!error && data) {
+    // Organiza por categoria no objeto RANKINGS_DATA
+    const grouped = {};
+    data.forEach(r => {
+      const wc = r.weight_class;
+      if (!grouped[wc]) grouped[wc] = [];
+      grouped[wc].push({
+        name: r.fighter_name,
+        team: r.team || '—',
+        country: r.country || '—',
+        w: r.wins || 0,
+        l: r.losses || 0,
+        last: r.last_result || '—'
+      });
+    });
+    
+    // Limpa e atualiza o objeto global
+    Object.keys(RANKINGS_DATA).forEach(k => delete RANKINGS_DATA[k]);
+    Object.assign(RANKINGS_DATA, grouped);
+  }
+}
+
 document.addEventListener('supabaseReady', async function () {
   await Promise.all([
     loadFightersFromSupabase(),
     loadTeamsFromSupabase(),
-    loadEventsFromSupabase()
+    loadEventsFromSupabase(),
+    loadRankingsFromSupabase()
   ]);
   checkUserSession();
+  
+  // Re-renderiza a página atual para refletir os dados carregados
   if (window.renderHome) window.renderHome();
+  if (document.getElementById('page-fighters') && window.renderFightersList) window.renderFightersList();
+  if (document.getElementById('page-teams') && window.renderTeamsList) window.renderTeamsList();
+  if (document.getElementById('page-events') && window.renderEventsList) window.renderEventsList();
+  if (document.getElementById('page-rankings') && window.renderRankings) window.renderRankings();
 });
 
 // =============================================

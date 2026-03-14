@@ -1,17 +1,19 @@
 export function renderTeamsScreen() {
   return `
-  <div style="background:var(--dark);padding:32px 40px 24px;">
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:4px;">Equipes</h2>
-    <p style="color:var(--gray-light);font-size:14px;">Academias e equipes de kickboxing cadastradas</p>
+  <div id="page-teams">
+    <div style="background:var(--dark);padding:32px 40px 24px;">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:4px;">Equipes</h2>
+      <p style="color:var(--gray-light);font-size:14px;">Academias e equipes de kickboxing cadastradas</p>
+    </div>
+    <div class="search-bar-section">
+      <input class="search-input" placeholder="Buscar equipe por nome ou cidade..." id="teams-search" oninput="filterTeams()">
+      <select class="filter-select">
+        <option>Todos os Estados</option>
+        <option>São Paulo</option><option>Rio de Janeiro</option><option>Minas Gerais</option><option>Paraná</option><option>Bahia</option>
+      </select>
+    </div>
+    <div class="section"><div class="teams-grid" id="teams-grid"></div></div>
   </div>
-  <div class="search-bar-section">
-    <input class="search-input" placeholder="Buscar equipe por nome ou cidade..." id="teams-search" oninput="filterTeams()">
-    <select class="filter-select">
-      <option>Todos os Estados</option>
-      <option>São Paulo</option><option>Rio de Janeiro</option><option>Minas Gerais</option><option>Paraná</option><option>Bahia</option>
-    </select>
-  </div>
-  <div class="section"><div class="teams-grid" id="teams-grid"></div></div>
   `;
 }
 
