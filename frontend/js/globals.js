@@ -34,6 +34,20 @@ export function initModalListeners() {
 }
 
 // =============================================
+// MOBILE MENU
+// =============================================
+export function toggleMobileMenu() {
+  const menu = document.getElementById('nav-mobile-menu');
+  if (menu) menu.classList.toggle('open');
+}
+
+export function closeMobileMenu() {
+  const menu = document.getElementById('nav-mobile-menu');
+  if (menu) menu.classList.remove('open');
+}
+
+
+// =============================================
 // NAVIGATION & TABS
 // =============================================
 export function switchTab(e, tabId) {

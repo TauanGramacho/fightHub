@@ -29,6 +29,8 @@ window.logout = logout;
 window.requireAuth = requireAuth;
 window.addFighter = addFighter;
 window.resendConfirmation = resendConfirmation;
+window.toggleMobileMenu = globals.toggleMobileMenu;
+window.closeMobileMenu = globals.closeMobileMenu;
 
 window.renderHome = () => {
   if (document.getElementById('page-home')) {

@@ -19,7 +19,28 @@ export function renderNavbar() {
       <button class="btn btn-outline" onclick="openModal('modal-add-event')">+ Evento</button>
       <button class="btn btn-red" onclick="logout()">Sair</button>
     </div>
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="nav-mobile-menu" id="nav-mobile-menu">
+    <a onclick="showPage('home');closeMobileMenu()">Início</a>
+    <a onclick="showPage('fighters');closeMobileMenu()">Lutadores</a>
+    <a onclick="showPage('teams');closeMobileMenu()">Equipes</a>
+    <a onclick="showPage('events');closeMobileMenu()">Eventos</a>
+    <a onclick="showPage('rankings');closeMobileMenu()">Rankings</a>
+    <hr class="nav-mobile-divider">
+    <div id="nav-mobile-auth">
+      <button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="showPage('login');closeMobileMenu()">Entrar</button>
+      <button class="btn btn-red" style="width:100%;" onclick="showPage('register');closeMobileMenu()">Cadastrar</button>
+    </div>
+    <div id="nav-mobile-user" style="display:none;">
+      <div style="color:var(--gray-light);font-size:13px;padding:8px 16px;">Olá, <strong style="color:var(--white);" id="user-greeting-mobile"></strong></div>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="openModal('modal-add-fighter');closeMobileMenu()">+ Lutador</button>
+      <button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="openModal('modal-add-event');closeMobileMenu()">+ Evento</button>
+      <button class="btn btn-red" style="width:100%;" onclick="logout();closeMobileMenu()">Sair</button>
+    </div>
+  </div>
   `;
 }
 
