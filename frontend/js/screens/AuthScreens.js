@@ -4,10 +4,10 @@ export function renderLoginScreen() {
     <div class="auth-box">
       <div class="auth-logo">FIGHT<span>HUB</span></div>
       <div class="auth-sub">Entre na sua conta</div>
-      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com" id="login-email"></div>
+      <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com" id="login-email" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="form-group"><label class="form-label">Senha</label>
         <div style="position:relative;">
-          <input class="form-input" type="password" placeholder="••••••••" id="login-password" style="padding-right:40px;width:100%;">
+          <input class="form-input" type="password" placeholder="••••••••" id="login-password" style="padding-right:40px;width:100%;" onkeydown="if(event.key==='Enter')doLogin()">
           <button type="button" onclick="togglePassword('login-password', this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
@@ -35,7 +35,7 @@ export function renderRegisterScreen() {
       <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" placeholder="seu@email.com" id="reg-email"></div>
       <div class="form-group"><label class="form-label">Senha</label>
         <div style="position:relative;">
-          <input class="form-input" type="password" placeholder="Mínimo 8 caracteres" id="reg-password" style="padding-right:40px;width:100%;">
+          <input class="form-input" type="password" placeholder="Mínimo 8 caracteres" id="reg-password" style="padding-right:40px;width:100%;" onkeydown="if(event.key==='Enter')document.getElementById('reg-password2').focus()">
           <button type="button" onclick="togglePassword('reg-password', this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
@@ -43,7 +43,7 @@ export function renderRegisterScreen() {
       </div>
       <div class="form-group"><label class="form-label">Confirmar Senha</label>
         <div style="position:relative;">
-          <input class="form-input" type="password" placeholder="Repita a senha" id="reg-password2" style="padding-right:40px;width:100%;">
+          <input class="form-input" type="password" placeholder="Repita a senha" id="reg-password2" style="padding-right:40px;width:100%;" onkeydown="if(event.key==='Enter')doRegister()">
           <button type="button" onclick="togglePassword('reg-password2', this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
