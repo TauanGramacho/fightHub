@@ -167,16 +167,16 @@ export function renderFooter() {
           Transformando ideias em software de alto impacto. Especialistas em engenharia web e soluções digitais sob medida.
         </p>
         <div style="font-size:13px;color:var(--gray-light);">
-          Gestor de T.I: <a href="https://www.linkedin.com/in/tauan-gramacho-7b6661229/" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--gold)'">Tauan Gramacho</a>
+          Engenheiro de Software & Tech Lead: <a href="https://www.linkedin.com/in/tauan-gramacho-7b6661229/" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:600;transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--gold)'">Tauan Gramacho</a>
         </div>
       </div>
       
       <div style="flex:1;min-width:250px;">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--white);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;">Contatos</div>
         <div style="display:flex;flex-direction:column;gap:12px;color:var(--gray-light);font-size:14px;">
-          <a href="https://instagram.com/codenity.solutions" target="_blank" style="color:var(--gray-light);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--gray-light)'">
+          <a href="https://www.instagram.com/codenity.ti/" target="_blank" style="color:var(--gray-light);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--gray-light)'">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-            codenity.solutions
+            codenity.ti
           </a>
           <a href="mailto:codenity.solutions@gmail.com" style="color:var(--gray-light);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--gray-light)'">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
