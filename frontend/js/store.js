@@ -191,8 +191,8 @@ export async function loadRankingsFromSupabase() {
   // 1. Busca da tabela oficial de rankings
   const { data: rankTable, error: err1 } = await window.supabase.from('rankings').select('*').order('position', { ascending: true });
   
-  // 2. Busca da tabela de lutadores (quem tem rank atribuído)
-  const { data: fightersTable, error: err2 } = await window.supabase.from('fighters').select('*').not('rank', 'is', null).order('rank', { ascending: true });
+  // 2. Busca da tabela de lutadores (TODOS para incluir no ranking por vitórias)
+  const { data: fightersTable, error: err2 } = await window.supabase.from('fighters').select('*');
 
   const grouped = {};
 
@@ -223,7 +223,7 @@ export async function loadRankingsFromSupabase() {
       if (!wc) return;
       if (!grouped[wc]) grouped[wc] = [];
       
-      // Evita duplicatas se já estiver na tabela de rankings pelo nome
+      // Evita duplicatas se já estiver na tabela de rankings oficial pelo nome
       const exists = grouped[wc].some(x => x.name.toLowerCase() === f.name.toLowerCase());
       if (!exists) {
         grouped[wc].push({
@@ -233,15 +233,29 @@ export async function loadRankingsFromSupabase() {
           w: f.wins || 0,
           l: f.losses || 0,
           last: '—',
-          pos: f.rank
+          pos: f.rank // pode ser null
         });
       }
     });
   }
 
-  // Ordena cada categoria pela posição/rank
+  // Ordena cada categoria:
+  // 1. Quem tem 'pos' definido (oficial ou rank manual) vem primeiro, em ordem crescente.
+  // 2. Quem não tem 'pos' (null), vem depois, ordenado por mais Vitórias (w), e depois menos Derrotas (l).
   Object.keys(grouped).forEach(cat => {
-    grouped[cat].sort((a, b) => (a.pos || 99) - (b.pos || 99));
+    grouped[cat].sort((a, b) => {
+      const aHasPos = a.pos !== null && a.pos !== undefined;
+      const bHasPos = b.pos !== null && b.pos !== undefined;
+      
+      if (aHasPos && bHasPos) return a.pos - b.pos;
+      if (aHasPos && !bHasPos) return -1;
+      if (!aHasPos && bHasPos) return 1;
+      
+      // Nenhum tem pos, desempata por Vitórias (decrescente)
+      if (b.w !== a.w) return b.w - a.w;
+      // Desempata por Derrotas (crescente)
+      return a.l - b.l;
+    });
   });
 
   // Limpa e atualiza o objeto global
