@@ -443,8 +443,6 @@ export async function addFighter() {
   }
 
   const payload = {
-    first_name: nome,
-    last_name: sobrenome,
     name: fullName,
     nick: nick,
     nationality: nationality,
