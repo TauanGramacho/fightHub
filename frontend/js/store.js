@@ -196,10 +196,13 @@ export async function loadRankingsFromSupabase() {
 
   const grouped = {};
 
+  // Helper para normalizar strings de categoria
+  const normalizeWC = (s) => s.trim().replace(/\s+/g, ' ');
+
   // Processa tabela oficial (Rankings)
   if (!err1 && rankTable) {
     rankTable.forEach(r => {
-      const wc = r.weight_class;
+      const wc = normalizeWC(r.weight_class);
       if (!grouped[wc]) grouped[wc] = [];
       grouped[wc].push({
         name: r.fighter_name,
@@ -216,7 +219,7 @@ export async function loadRankingsFromSupabase() {
   // Processa lutadores ranqueados (Híbrido)
   if (!err2 && fightersTable) {
     fightersTable.forEach(f => {
-      const wc = f.division;
+      const wc = f.division ? normalizeWC(f.division) : null;
       if (!wc) return;
       if (!grouped[wc]) grouped[wc] = [];
       
@@ -229,7 +232,7 @@ export async function loadRankingsFromSupabase() {
           country: f.nationality || '—',
           w: f.wins || 0,
           l: f.losses || 0,
-          last: '—', // Poderia puxar do histórico futuramente
+          last: '—',
           pos: f.rank
         });
       }
