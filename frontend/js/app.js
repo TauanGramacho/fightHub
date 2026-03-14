@@ -101,12 +101,14 @@ window.renderTeamsList = function() {
 }
 
 window.renderRankings = function(wc) {
-  const category = wc || 'Peso Pena (−60kg)';
-  const data = RANKINGS_DATA[category] || [];
+  const normalize = (s) => s.trim().replace(/\s+/g, ' ').toLowerCase();
+  const rawCategory = wc || 'Peso Pena (−60kg)';
+  const normalizedKey = normalize(rawCategory);
+  const data = RANKINGS_DATA[normalizedKey] || [];
   const body = document.getElementById('ranking-body');
   const title = document.getElementById('ranking-wc-title');
   
-  if (title) title.textContent = category;
+  if (title) title.textContent = rawCategory;
   if (body) {
     if (data.length === 0) {
       body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-light);">Sem dados para esta categoria.</td></tr>';

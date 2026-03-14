@@ -196,8 +196,8 @@ export async function loadRankingsFromSupabase() {
 
   const grouped = {};
 
-  // Helper para normalizar strings de categoria
-  const normalizeWC = (s) => s.trim().replace(/\s+/g, ' ');
+  // Helper para normalizar strings de categoria (ignora espaços extras e maiúsculas/minúsculas)
+  const normalizeWC = (s) => s.trim().replace(/\s+/g, ' ').toLowerCase();
 
   // Processa tabela oficial (Rankings)
   if (!err1 && rankTable) {
