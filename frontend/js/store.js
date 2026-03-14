@@ -336,11 +336,22 @@ export async function doRegister() {
   });
   
   if (error) {
-    window.showToast('Erro no cadastro: ' + error.message, true);
+    if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+      window.showToast('Este e-mail já está cadastrado! Faça login.', true);
+    } else {
+      window.showToast('Erro no cadastro: ' + error.message, true);
+    }
     return;
   }
   
-  // If email confirmation is enabled, data.user.identities might be empty for unconfirmed user or session is null
+  // Supabase com "Email Enumeration Protection" ligada retorna sucesso fake
+  // quando o email já existe. Detectamos isso verificando se identities está vazio.
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    window.showToast('Este e-mail já está cadastrado! Faça login.', true);
+    return;
+  }
+  
+  // Email confirmation enabled: session é null e user existe
   if (data.user && data.session === null) {
     window.showPage('confirm-email');
     setTimeout(() => {

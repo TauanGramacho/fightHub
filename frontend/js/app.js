@@ -61,21 +61,47 @@ window.renderFightersList = function(list) {
   }
 }
 
-window.renderHome = function() {
+window.renderHome = async function() {
   const elFighters = document.getElementById('stat-fighters');
   const elTeams = document.getElementById('stat-teams');
   const elEvents = document.getElementById('stat-events');
   const elFights = document.getElementById('stat-fights');
   
-  if(elFighters) elFighters.textContent = FIGHTERS.length.toLocaleString('pt-BR');
-  if(elTeams) elTeams.textContent = TEAMS.length.toLocaleString('pt-BR');
-  if(elEvents) elEvents.textContent = EVENTS.length.toLocaleString('pt-BR');
-  
-  if(elFights) {
-    // Calcula um número aproximado de lutas somando vitórias, derrotas e empates dos atletas
-    const totalFights = FIGHTERS.reduce((acc, f) => acc + (f.wins || 0) + (f.losses || 0) + (f.draws || 0), 0);
-    // Dividimos por 2 pois cada confronto envolve dois lutadores teoricamente
-    elFights.textContent = Math.ceil(totalFights / 2).toLocaleString('pt-BR');
+  // Tenta puxar contagens reais do Supabase
+  if (window.supabase && typeof window.supabase.from === 'function') {
+    try {
+      const [fRes, tRes, eRes] = await Promise.all([
+        window.supabase.from('fighters').select('id', { count: 'exact', head: true }),
+        window.supabase.from('teams').select('id', { count: 'exact', head: true }),
+        window.supabase.from('events').select('id', { count: 'exact', head: true }),
+      ]);
+      
+      if (elFighters) elFighters.textContent = (fRes.count || FIGHTERS.length).toLocaleString('pt-BR');
+      if (elTeams) elTeams.textContent = (tRes.count || TEAMS.length).toLocaleString('pt-BR');
+      if (elEvents) elEvents.textContent = (eRes.count || EVENTS.length).toLocaleString('pt-BR');
+      
+      if (elFights) {
+        const totalFights = FIGHTERS.reduce((acc, f) => acc + (f.wins || 0) + (f.losses || 0) + (f.draws || 0), 0);
+        elFights.textContent = Math.ceil(totalFights / 2).toLocaleString('pt-BR');
+      }
+    } catch(e) {
+      // Fallback para dados locais
+      if(elFighters) elFighters.textContent = FIGHTERS.length.toLocaleString('pt-BR');
+      if(elTeams) elTeams.textContent = TEAMS.length.toLocaleString('pt-BR');
+      if(elEvents) elEvents.textContent = EVENTS.length.toLocaleString('pt-BR');
+      if(elFights) {
+        const totalFights = FIGHTERS.reduce((acc, f) => acc + (f.wins || 0) + (f.losses || 0) + (f.draws || 0), 0);
+        elFights.textContent = Math.ceil(totalFights / 2).toLocaleString('pt-BR');
+      }
+    }
+  } else {
+    if(elFighters) elFighters.textContent = FIGHTERS.length.toLocaleString('pt-BR');
+    if(elTeams) elTeams.textContent = TEAMS.length.toLocaleString('pt-BR');
+    if(elEvents) elEvents.textContent = EVENTS.length.toLocaleString('pt-BR');
+    if(elFights) {
+      const totalFights = FIGHTERS.reduce((acc, f) => acc + (f.wins || 0) + (f.losses || 0) + (f.draws || 0), 0);
+      elFights.textContent = Math.ceil(totalFights / 2).toLocaleString('pt-BR');
+    }
   }
 
   const hgrid = document.getElementById('home-fighters');
