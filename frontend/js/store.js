@@ -104,12 +104,21 @@ export const state = {
 // =============================================
 export function initSupabase() {
   if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) return;
-  import('https://esm.sh/@supabase/supabase-js@2').then(function (mod) {
-    window.supabase = mod.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+  // Se carregado via script tag, createClient estará em window.supabase (ou window.supabase.createClient)
+  const createClient = window.supabase?.createClient || window.supabase;
+  
+  if (typeof createClient === 'function') {
+    window.supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
     document.dispatchEvent(new CustomEvent('supabaseReady'));
-  }).catch(function (e) {
-    console.error('Supabase load error:', e);
-  });
+  } else {
+    // Fallback para import dinâmico se a script tag falhar
+    import('https://esm.sh/@supabase/supabase-js@2').then(function (mod) {
+      window.supabase = mod.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      document.dispatchEvent(new CustomEvent('supabaseReady'));
+    }).catch(function (e) {
+      console.error('Supabase load error:', e);
+    });
+  }
 }
 
 export function mapRowToFighter(row) {
