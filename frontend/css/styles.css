@@ -300,7 +300,101 @@
   .breadcrumb .sep { color: var(--dark4); }
   .breadcrumb .current { color: var(--white); }
 
+  /* =============================================
+     FAB — FLOATING ACTION BUTTONS
+  ============================================= */
+  .fab-container {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .fab-main {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--red) 0%, #c0101f 100%);
+    border: none;
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(232,25,44,0.5);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex-shrink: 0;
+  }
+  .fab-main:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(232,25,44,0.7);
+  }
+  .fab-main.open {
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, var(--dark4) 0%, var(--dark3) 100%);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .fab-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease;
+    pointer-events: none;
+  }
+  .fab-actions.open {
+    max-height: 200px;
+    opacity: 1;
+    pointer-events: all;
+  }
+  .fab-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fab-tooltip {
+    background: var(--dark2);
+    border: 1px solid var(--dark4);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    white-space: nowrap;
+    border-radius: 2px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  }
+  .fab-action-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--dark2);
+    border: 2px solid var(--red);
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .fab-action-btn:hover {
+    background: var(--red);
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(232,25,44,0.4);
+  }
+
   ::-webkit-scrollbar { width: 6px; }
+
   ::-webkit-scrollbar-track { background: var(--dark); }
   ::-webkit-scrollbar-thumb { background: var(--dark4); }
   ::-webkit-scrollbar-thumb:hover { background: var(--red); }

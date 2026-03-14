@@ -405,12 +405,17 @@ export function updateAuthUI() {
   const navAuth = document.getElementById('nav-auth');
   const navUser = document.getElementById('nav-user');
   const greeting = document.getElementById('user-greeting');
+  const greetingMobile = document.getElementById('user-greeting-mobile');
+  const fab = document.getElementById('fab-container');
   
   if (navAuth) navAuth.style.display = state.currentUser ? 'none' : 'flex';
   if (navUser) navUser.style.display = state.currentUser ? 'flex' : 'none';
-  if (greeting && state.currentUser) {
+  if (fab) fab.style.display = state.currentUser ? 'flex' : 'none';
+
+  if (state.currentUser) {
     const name = state.currentUser.user_metadata?.first_name || state.currentUser.email.split('@')[0];
-    greeting.textContent = name;
+    if (greeting) greeting.textContent = name;
+    if (greetingMobile) greetingMobile.textContent = name;
   }
 }
 

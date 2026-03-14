@@ -46,6 +46,21 @@ export function closeMobileMenu() {
   if (menu) menu.classList.remove('open');
 }
 
+export function toggleFAB() {
+  const actions = document.getElementById('fab-actions');
+  const mainBtn = document.getElementById('fab-main');
+  if (!actions || !mainBtn) return;
+  const isOpen = actions.classList.toggle('open');
+  mainBtn.classList.toggle('open', isOpen);
+}
+
+export function closeFAB() {
+  const actions = document.getElementById('fab-actions');
+  const mainBtn = document.getElementById('fab-main');
+  if (actions) actions.classList.remove('open');
+  if (mainBtn) mainBtn.classList.remove('open');
+}
+
 
 // =============================================
 // NAVIGATION & TABS

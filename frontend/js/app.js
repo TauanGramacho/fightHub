@@ -1,4 +1,4 @@
-import { renderNavbar, renderModals, renderToast, renderFooter } from './components/GlobalComponents.js';
+import { renderNavbar, renderModals, renderToast, renderFooter, renderFAB } from './components/GlobalComponents.js';
 import { renderHomeScreen } from './screens/HomeScreen.js';
 import { renderFightersScreen } from './screens/FightersScreen.js';
 import { renderFighterProfileScreen } from './screens/FighterProfileScreen.js';
@@ -31,6 +31,8 @@ window.addFighter = addFighter;
 window.resendConfirmation = resendConfirmation;
 window.toggleMobileMenu = globals.toggleMobileMenu;
 window.closeMobileMenu = globals.closeMobileMenu;
+window.toggleFAB = globals.toggleFAB;
+window.closeFAB = globals.closeFAB;
 
 window.renderHome = () => {
   if (document.getElementById('page-home')) {
@@ -163,6 +165,7 @@ function initApp() {
   document.getElementById('modals-container').innerHTML = renderModals();
   document.getElementById('toast-container').innerHTML = renderToast();
   document.getElementById('footer-container').innerHTML = renderFooter();
+  document.getElementById('fab-container-wrapper').innerHTML = renderFAB();
 
   globals.initModalListeners();
   initSupabase();

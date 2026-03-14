@@ -15,8 +15,6 @@ export function renderNavbar() {
     </div>
     <div class="nav-right" id="nav-user" style="display:none">
       <span style="font-size:13px;color:var(--gray-light);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">Olá, <strong style="color:var(--white);" id="user-greeting"></strong></span>
-      <button class="btn btn-outline" onclick="openModal('modal-add-fighter')">+ Lutador</button>
-      <button class="btn btn-outline" onclick="openModal('modal-add-event')">+ Evento</button>
       <button class="btn btn-red" onclick="logout()">Sair</button>
     </div>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
@@ -36,14 +34,38 @@ export function renderNavbar() {
     </div>
     <div id="nav-mobile-user" style="display:none;">
       <div style="color:var(--gray-light);font-size:13px;padding:8px 16px;">Olá, <strong style="color:var(--white);" id="user-greeting-mobile"></strong></div>
-      <button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="openModal('modal-add-fighter');closeMobileMenu()">+ Lutador</button>
-      <button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="openModal('modal-add-event');closeMobileMenu()">+ Evento</button>
-      <button class="btn btn-red" style="width:100%;" onclick="logout();closeMobileMenu()">Sair</button>
+      <button class="btn btn-red" style="width:100%;margin-top:4px;" onclick="logout();closeMobileMenu()">Sair</button>
     </div>
   </div>
   `;
 }
 
+export function renderFAB() {
+  return /*html*/`
+  <!-- FAB: Floating Action Buttons (shown when user is logged in) -->
+  <div class="fab-container" id="fab-container" style="display:none;">
+    <!-- individual action buttons (hidden by default, appear on expand) -->
+    <div class="fab-actions" id="fab-actions">
+      <div class="fab-item">
+        <span class="fab-tooltip">Novo Evento</span>
+        <button class="fab-action-btn" onclick="openModal('modal-add-event')" aria-label="Cadastrar Evento">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line></svg>
+        </button>
+      </div>
+      <div class="fab-item">
+        <span class="fab-tooltip">Novo Lutador</span>
+        <button class="fab-action-btn" onclick="openModal('modal-add-fighter')" aria-label="Cadastrar Lutador">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+        </button>
+      </div>
+    </div>
+    <!-- main FAB toggle button -->
+    <button class="fab-main" id="fab-main" onclick="toggleFAB()" aria-label="Adicionar">
+      <svg id="fab-icon-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.3s;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+  </div>
+  `;
+}
 export function renderModals() {
   return `
   <!-- MODAL ADD FIGHTER -->
