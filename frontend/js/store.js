@@ -347,10 +347,20 @@ export async function doRegister() {
 }
 
 export async function resendConfirmation() {
-  const email = document.getElementById('reg-email')?.value;
-  if (!email || !window.supabase) { window.showToast('Email não encontrado', true); return; }
-  await window.supabase.auth.resend({ type: 'signup', email });
-  window.showToast('E-mail re-enviado!');
+  const emailDisplay = document.getElementById('confirm-email-display');
+  const email = emailDisplay ? emailDisplay.textContent.trim() : null;
+  
+  if (!email || email === '—' || !window.supabase) { 
+    window.showToast('Email não encontrado para reenvio', true); 
+    return; 
+  }
+  
+  const { error } = await window.supabase.auth.resend({ type: 'signup', email });
+  if (error) {
+    window.showToast('Erro ao reenviar: ' + error.message, true);
+  } else {
+    window.showToast('E-mail re-enviado com sucesso!');
+  }
 }
 
 export async function logout() {
