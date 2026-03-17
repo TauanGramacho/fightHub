@@ -1,4 +1,4 @@
-import { renderNavbar, renderModals, renderToast, renderFooter, renderFAB } from './components/GlobalComponents.js';
+﻿import { renderNavbar, renderModals, renderToast, renderFooter, renderFAB } from './components/GlobalComponents.js';
 import { renderHomeScreen } from './screens/HomeScreen.js';
 import { renderFightersScreen } from './screens/FightersScreen.js';
 import { renderFighterProfileScreen } from './screens/FighterProfileScreen.js';
@@ -10,7 +10,7 @@ import { renderEliteProfilesScreen, renderCompareScreen } from './screens/EliteP
 
 import { 
   state, FIGHTERS, TEAMS, EVENTS, RANKINGS_DATA, FIGHT_HISTORY, 
-  initSupabase, loadFightersFromSupabase,
+  initSupabase, loadFightersFromSupabase, syncFighterDivisionFromWeight,
   doLogin, doRegister, logout, requireAuth, addFighter, resendConfirmation
 } from './store.js';
 import * as globals from './globals.js';
@@ -30,6 +30,7 @@ window.logout = logout;
 window.requireAuth = requireAuth;
 window.addFighter = addFighter;
 window.resendConfirmation = resendConfirmation;
+window.syncFighterDivisionFromWeight = syncFighterDivisionFromWeight;
 window.toggleMobileMenu = globals.toggleMobileMenu;
 window.closeMobileMenu = globals.closeMobileMenu;
 window.toggleFAB = globals.toggleFAB;
@@ -193,34 +194,86 @@ window.renderRankings = function(wc) {
   const normalize = (s) => String(s || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[−âˆ’]/g, '-')
+    .replace(/[−–—âˆ’Ã¢Ë†â€™]/g, '-')
     .trim()
     .replace(/\s+/g, ' ')
     .toLowerCase();
+
+  const inferDivision = (fighter) => {
+    const rawWeight = typeof fighter.weight === 'string' ? parseInt(fighter.weight, 10) : fighter.weight_kg;
+    const weight = Number(rawWeight);
+    if (!Number.isFinite(weight) || weight <= 0) return fighter.div || '';
+    if (weight <= 52) return 'Peso Mosca (-52kg)';
+    if (weight <= 56) return 'Peso Galo (-56kg)';
+    if (weight <= 60) return 'Peso Pena (-60kg)';
+    if (weight <= 65) return 'Peso Leve (-65kg)';
+    if (weight <= 71) return 'Peso Meio-Medio (-71kg)';
+    if (weight <= 75) return 'Peso Medio (-75kg)';
+    if (weight <= 81) return 'Peso Meio-Pesado (-81kg)';
+    return 'Peso Pesado (+81kg)';
+  };
+
   const rawCategory = wc || 'Peso Mosca (-52kg)';
   const normalizedKey = normalize(rawCategory);
-  const data = RANKINGS_DATA[normalizedKey] || [];
+  const directData = RANKINGS_DATA[normalizedKey];
+  const matchedEntry = Object.entries(RANKINGS_DATA).find(([key]) => normalize(key) === normalizedKey);
+  const fallbackData = FIGHTERS
+    .filter((fighter) => normalize(inferDivision(fighter) || fighter.div) === normalizedKey)
+    .sort((a, b) => {
+      const winsDiff = (b.wins || 0) - (a.wins || 0);
+      if (winsDiff !== 0) return winsDiff;
+      const lossesDiff = (a.losses || 0) - (b.losses || 0);
+      if (lossesDiff !== 0) return lossesDiff;
+      return (b.draws || 0) - (a.draws || 0);
+    })
+    .map((fighter) => ({
+      name: fighter.name,
+      team: fighter.team || '-',
+      country: fighter.nat || '-',
+      w: fighter.wins || 0,
+      l: fighter.losses || 0,
+      last: '-',
+    }));
+
+  const baseData = Array.isArray(directData)
+    ? directData
+    : Array.isArray(matchedEntry?.[1])
+      ? matchedEntry[1]
+      : [];
+
+  const data = [...baseData];
+  fallbackData.forEach((fighterRow) => {
+    const exists = data.some((row) => normalize(row.name) === normalize(fighterRow.name));
+    if (!exists) {
+      data.push(fighterRow);
+    }
+  });
+
   const body = document.getElementById('ranking-body');
   const title = document.getElementById('ranking-wc-title');
-  
+
   if (title) title.textContent = rawCategory;
-  if (body) {
-    if (data.length === 0) {
-      body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-light);">Sem dados para esta categoria.</td></tr>';
-    } else {
-      body.innerHTML = data.map((r, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td style="color:var(--white);font-weight:600;">${r.name}</td>
-          <td>${r.team}</td>
-          <td>${r.country}</td>
-          <td>${r.w}</td>
-          <td>${r.l}</td>
-          <td><span class="res-badge ${r.last}">${r.last}</span></td>
-        </tr>
-      `).join('');
-    }
+  if (!body) return;
+
+  if (!data.length) {
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-light);">Sem dados para esta categoria.</td></tr>';
+    return;
   }
+
+  body.innerHTML = data.map((r, i) => {
+    const last = ['W', 'L', 'D'].includes(String(r.last || '').toUpperCase()) ? String(r.last).toUpperCase() : '-';
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td style="color:var(--white);font-weight:600;">${r.name || '-'}</td>
+        <td>${r.team || '-'}</td>
+        <td>${r.country || '-'}</td>
+        <td>${r.w ?? 0}</td>
+        <td>${r.l ?? 0}</td>
+        <td>${last === '-' ? '-' : `<span class="res-badge ${last}">${last}</span>`}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // ... Additional helper/render functions might be needed later
@@ -276,3 +329,4 @@ document.addEventListener('supabaseReady', () => {
     showPage(pageId, params);
   }
 });
+
