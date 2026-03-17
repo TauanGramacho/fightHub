@@ -28,8 +28,10 @@ export function renderFighterProfileScreen() {
         <button class="btn btn-outline" id="profile-compare-btn" onclick="compareActiveFighter()">Comparar</button>
         <button class="btn btn-outline" id="profile-edit-photo-btn" style="display:none;" onclick="openOwnPhotoEditor()">Editar foto</button>
       </div>
-      <div id="profile-follow-summary" style="margin-top:16px;"></div>
-      <div id="profile-showcase-panel" style="margin-top:18px;"></div>
+      <div class="profile-side-panels">
+        <div id="profile-follow-summary"></div>
+        <div id="profile-showcase-panel"></div>
+      </div>
     </div>
   </div>
   <div class="profile-info-grid">

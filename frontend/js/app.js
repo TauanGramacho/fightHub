@@ -91,7 +91,10 @@ function buildHash(pageId, params = {}) {
 }
 
 window.renderFightersList = function(list) {
-  const fighters = list || FIGHTERS;
+  const fighters = (list || FIGHTERS).filter((fighter, index, all) => {
+    const fighterId = String(fighter.id);
+    return all.findIndex((item) => String(item.id) === fighterId) === index;
+  });
   const grid = document.getElementById('fighters-grid');
   if (grid) {
     grid.innerHTML = fighters.map(globals.fighterCardHTML).join('') || 

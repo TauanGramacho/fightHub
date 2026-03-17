@@ -264,13 +264,13 @@
 
   /* PROFILE */
   .profile-header { background: var(--dark); position: relative; overflow: hidden; }
-  .profile-bg { position: absolute; inset: 0; background: linear-gradient(to right, var(--dark) 40%, transparent); z-index: 1; }
+  .profile-bg { position: absolute; inset: 0; background: linear-gradient(to right, var(--dark) 30%, transparent 48%); z-index: 1; }
   .profile-bg-img {
-    position: absolute; right: 0; top: 0; height: 100%; width: 50%;
+    position: absolute; right: 0; top: 0; height: 100%; width: 56%;
     background: var(--dark2); display: flex; align-items: center; justify-content: center;
     font-size: 120px; color: var(--dark3); overflow: hidden;
   }
-  .profile-content { position: relative; z-index: 2; padding: 48px 40px; max-width: 600px; }
+  .profile-content { position: relative; z-index: 2; padding: 40px 24px 36px; width: 44%; max-width: none; }
   .profile-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .profile-name { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 0.9; letter-spacing: 2px; margin-bottom: 8px; }
   .profile-nick { font-size: 18px; color: var(--gold); font-style: italic; margin-bottom: 20px; }

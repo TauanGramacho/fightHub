@@ -695,7 +695,8 @@ export async function updateFighterShowcase(fighterId, changes) {
   if (error) throw error;
 
   const mapped = mapRowToFighter(data);
-  const index = FIGHTERS.findIndex((fighter) => fighter.id === fighterId);
+  const normalizedId = String(fighterId);
+  const index = FIGHTERS.findIndex((fighter) => String(fighter.id) === normalizedId);
   if (index >= 0) {
     FIGHTERS[index] = mapped;
   } else {

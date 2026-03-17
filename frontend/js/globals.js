@@ -347,7 +347,8 @@ function buildPixCopyCode() {
 }
 
 async function ensureFighterLoaded(id) {
-  const existing = FIGHTERS.find((item) => item.id === id);
+  const normalizedId = String(id);
+  const existing = FIGHTERS.find((item) => String(item.id) === normalizedId);
   if (existing || !window.supabase) return existing || null;
 
   const { data, error } = await window.supabase
@@ -359,7 +360,12 @@ async function ensureFighterLoaded(id) {
   if (error || !data) return null;
 
   const mapped = mapRowToFighter(data);
-  FIGHTERS.push(mapped);
+  const existingIndex = FIGHTERS.findIndex((item) => String(item.id) === String(mapped.id));
+  if (existingIndex >= 0) {
+    FIGHTERS[existingIndex] = mapped;
+  } else {
+    FIGHTERS.push(mapped);
+  }
   return mapped;
 }
 
@@ -973,6 +979,24 @@ export function teamCardHTML(t) {
 // =============================================
 // PROFILES
 // =============================================
+function calculateAgeFromDob(dob) {
+  if (!dob || dob === '—' || dob === '-') return null;
+
+  const birthDate = new Date(`${dob}T00:00:00`);
+  if (Number.isNaN(birthDate.getTime())) return null;
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const dayDiff = today.getDate() - birthDate.getDate();
+
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age -= 1;
+  }
+
+  return age >= 0 ? age : null;
+}
+
 export async function showFighterProfile(id, options = {}) {
   let f = FIGHTERS.find(x => x.id === id);
   if (!f) {
@@ -1004,7 +1028,8 @@ export async function showFighterProfile(id, options = {}) {
     document.getElementById('profile-l').textContent = f.losses;
     document.getElementById('profile-d').textContent = f.draws;
     document.getElementById('pi-dob').textContent = f.dob || '—';
-    document.getElementById('pi-age').textContent = f.age ? f.age + ' anos' : '—';
+    const calculatedAge = calculateAgeFromDob(f.dob);
+    document.getElementById('pi-age').textContent = calculatedAge !== null ? calculatedAge + ' anos' : '—';
     document.getElementById('pi-nat').textContent = f.nat || '—';
     document.getElementById('pi-height').textContent = f.height || '—';
     document.getElementById('pi-weight').textContent = f.weight || '—';
