@@ -23,11 +23,11 @@ export function renderFighterProfileScreen() {
         <div class="record-block"><div class="record-num d" id="profile-d">0</div><div class="record-lbl">Empates</div></div>
       </div>
       <div class="profile-tags" id="profile-tags"></div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button class="btn btn-red" id="profile-follow-btn" onclick="toggleFollowActiveFighter()">+ Seguir</button>
-        <button class="btn btn-outline" id="profile-compare-btn" onclick="compareActiveFighter()">Comparar</button>
-        <button class="btn btn-outline" id="profile-edit-photo-btn" style="display:none;" onclick="openOwnPhotoEditor()">Editar foto</button>
-      </div>
+        <div class="profile-actions">
+          <button class="btn btn-red" id="profile-follow-btn" onclick="toggleFollowActiveFighter()">+ Seguir</button>
+          <button class="btn btn-outline" id="profile-compare-btn" onclick="compareActiveFighter()">Comparar</button>
+          <button class="btn btn-outline" id="profile-edit-photo-btn" style="display:none;" onclick="openOwnPhotoEditor()">Editar foto</button>
+        </div>
       <div class="profile-side-panels">
         <div id="profile-follow-summary"></div>
         <div id="profile-showcase-panel"></div>
@@ -49,6 +49,6 @@ export function renderFighterProfileScreen() {
   </div>
   <div class="tab-content active" id="tab-about"><div class="section" style="max-width:700px;"><p id="about-text" style="color:var(--white-dim);line-height:1.8;font-size:15px;"></p></div></div>
   <div class="tab-content" id="tab-fights"><div id="fight-history"></div></div>
-  <div class="tab-content" id="tab-stats"><div class="section"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;" id="stats-grid"></div><div id="profile-network"></div></div></div>
-  `;
+    <div class="tab-content" id="tab-stats"><div class="section"><div class="profile-stats-grid" id="stats-grid"></div><div id="profile-network"></div></div></div>
+    `;
 }
