@@ -12,6 +12,17 @@
     --white: #F5F5F0;
     --white-dim: rgba(245,245,240,0.7);
   }
+  html[data-theme="light"] {
+    --black: #f4efe4;
+    --dark: #fcf8ee;
+    --dark2: #f2eadb;
+    --dark3: #e7dac3;
+    --dark4: #cfbea2;
+    --gray: #8a7a63;
+    --gray-light: #665948;
+    --white: #171411;
+    --white-dim: rgba(23,20,17,0.72);
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior: smooth; }
   body {
@@ -55,6 +66,62 @@
   .nav-links a:hover, .nav-links a.active { color: var(--white); background: var(--dark3); }
   .nav-links a.active { color: var(--red); }
   .nav-right { display: flex; gap: 10px; align-items: center; margin-left: auto; }
+  .theme-toggle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  .theme-toggle-track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 92px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--dark4);
+    background: var(--dark2);
+    overflow: hidden;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .theme-toggle:hover .theme-toggle-track { border-color: var(--red); }
+  .theme-toggle-label {
+    position: relative;
+    z-index: 1;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    transition: color 0.2s ease;
+  }
+  .theme-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    height: calc(100% - 6px);
+    border-radius: 999px;
+    background: var(--red);
+    transition: transform 0.2s ease;
+  }
+  html[data-theme="light"] .theme-toggle-thumb {
+    transform: translateX(100%);
+  }
+  html[data-theme="light"] .theme-toggle-label-light,
+  html:not([data-theme="light"]) .theme-toggle-label-dark {
+    color: var(--white);
+  }
+  .theme-toggle-mobile {
+    width: 100%;
+    justify-content: center;
+    margin: 4px 0 10px;
+  }
   .btn {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700; font-size: 13px;
@@ -134,6 +201,21 @@
     font-family: 'Bebas Neue', sans-serif; font-size: 18px;
     padding: 2px 8px; letter-spacing: 1px; z-index: 2;
   }
+  .fighter-showcase-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    padding: 4px 10px 3px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffe89f 0%, #f0bf47 34%, #c88411 100%);
+    color: #5f3700;
+    border: 1px solid rgba(96,56,0,0.38);
+    box-shadow: 0 6px 14px rgba(245,166,35,0.18);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
   .fighter-card-body { padding: 14px 16px 16px; }
   .fighter-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; color: var(--white); margin-bottom: 4px; }
   .fighter-nick { font-size: 12px; color: var(--gold); margin-bottom: 8px; font-style: italic; }
@@ -201,6 +283,7 @@
   .profile-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
   .tag { background: var(--dark3); border: 1px solid var(--dark4); font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; color: var(--gray-light); }
   .tag.red { border-color: var(--red); color: var(--red); background: rgba(232,25,44,0.08); }
+  .tag.premium { border-color: rgba(240,191,71,0.48); color: #f7cb63; background: rgba(240,191,71,0.08); }
   .profile-info-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--dark4); border: 1px solid var(--dark4); }
   .info-cell { background: var(--dark2); padding: 16px 20px; }
   .info-cell .val { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
@@ -280,6 +363,527 @@
   .search-input:focus { border-color: var(--red); }
   .filter-select { background: var(--dark3); border: 1px solid var(--dark4); color: var(--gray-light); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1px; padding: 12px 16px; outline: none; cursor: pointer; }
 
+  /* ELITE PROFILES */
+  .elite-hero {
+    background: linear-gradient(180deg, var(--dark) 0%, var(--dark2) 100%);
+    padding: 56px 40px 36px;
+    text-align: center;
+    border-bottom: 1px solid var(--dark4);
+  }
+  .elite-hero-mark {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gray-light);
+    margin-bottom: 12px;
+  }
+  .elite-hero-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px;
+    width: 86px;
+    height: 86px;
+  }
+  .elite-hero-logo-primary {
+    margin-bottom: 14px;
+  }
+  .elite-logo-shield,
+  .elite-logo-ring,
+  .elite-logo-badge {
+    width: 86px;
+    height: 86px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .elite-logo-shield {
+    clip-path: polygon(50% 2%, 82% 13%, 82% 60%, 50% 98%, 18% 60%, 18% 13%);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 28%),
+      linear-gradient(180deg, #ff3145 0%, #d41428 48%, #8e0d1a 100%);
+    border: 2px solid rgba(245,166,35,0.95);
+    box-shadow:
+      0 14px 36px rgba(232,25,44,0.28),
+      inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+  .elite-logo-shield::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    clip-path: polygon(50% 2%, 82% 13%, 82% 60%, 50% 98%, 18% 60%, 18% 13%);
+    border: 1.5px solid rgba(255,255,255,0.18);
+  }
+  .elite-logo-shield::after {
+    content: '';
+    position: absolute;
+    inset: 14px 16px 13px;
+    background:
+      radial-gradient(circle at 50% 24%, rgba(255,214,122,0.24), rgba(255,214,122,0) 30%),
+      linear-gradient(180deg, rgba(17,17,17,0.08), rgba(17,17,17,0.44));
+    clip-path: polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0% 62%, 0% 14%);
+    opacity: 0.85;
+  }
+  .elite-logo-word {
+    font-family: 'Bebas Neue', sans-serif;
+    line-height: 1;
+    position: absolute;
+    z-index: 1;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.28);
+  }
+  .elite-logo-word-top {
+    top: 20px;
+    font-size: 17px;
+    letter-spacing: 3px;
+    color: #ffe8b7;
+  }
+  .elite-logo-word-bottom {
+    top: 45px;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .elite-logo-divider {
+    position: absolute;
+    top: 39px;
+    width: 30px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255,211,106,0), rgba(255,211,106,0.95), rgba(255,211,106,0));
+    z-index: 1;
+    box-shadow: 0 0 10px rgba(255,211,106,0.25);
+  }
+  .elite-logo-ring {
+    border: 3px solid rgba(245,166,35,0.95);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 0 0 6px rgba(232,25,44,0.12),
+      0 12px 28px rgba(245,166,35,0.12);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 28%, rgba(255,255,255,0.12), rgba(255,255,255,0) 26%),
+      linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+  }
+  .elite-logo-ring::before,
+  .elite-logo-ring::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+  }
+  .elite-logo-ring::before {
+    inset: 8px;
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .elite-logo-ring::after {
+    inset: 14px 10px 12px;
+    border-radius: 20px 20px 24px 24px;
+    border: 1px solid rgba(245,166,35,0.18);
+  }
+  .elite-logo-ring-fighter {
+    position: absolute;
+    width: 28px;
+    height: 48px;
+    top: 18px;
+    z-index: 1;
+  }
+  .elite-logo-ring-fighter-left {
+    left: 10px;
+    color: #f2c85e;
+    transform: rotate(-4deg);
+  }
+  .elite-logo-ring-fighter-right {
+    right: 10px;
+    color: #ff7449;
+    transform: scaleX(-1) rotate(-4deg);
+  }
+  .elite-logo-ring-head,
+  .elite-logo-ring-body,
+  .elite-logo-ring-arm,
+  .elite-logo-ring-leg {
+    position: absolute;
+    display: block;
+    background: currentColor;
+  }
+  .elite-logo-ring-head {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    top: 1px;
+    left: 8px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+  }
+  .elite-logo-ring-body {
+    width: 13px;
+    height: 18px;
+    top: 12px;
+    left: 7px;
+    border-radius: 8px 8px 7px 7px;
+    transform: skewX(-8deg);
+  }
+  .elite-logo-ring-arm {
+    width: 14px;
+    height: 5px;
+    border-radius: 999px;
+    top: 16px;
+  }
+  .elite-logo-ring-arm-front {
+    left: 13px;
+    transform: rotate(-18deg);
+    box-shadow: 7px -2px 0 2px currentColor;
+  }
+  .elite-logo-ring-arm-back {
+    left: -1px;
+    transform: rotate(54deg);
+  }
+  .elite-logo-ring-leg {
+    width: 14px;
+    height: 5px;
+    border-radius: 999px;
+    top: 33px;
+  }
+  .elite-logo-ring-leg-front {
+    left: 13px;
+    transform: rotate(46deg);
+  }
+  .elite-logo-ring-leg-back {
+    left: -1px;
+    transform: rotate(-54deg);
+  }
+  .elite-logo-badge {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,243,204,0.9) 0 36%, rgba(255,243,204,0) 36.5%),
+      radial-gradient(circle at 50% 50%, rgba(163,104,6,0.95) 0 47%, rgba(163,104,6,0) 47.5%),
+      radial-gradient(circle at 50% 50%, rgba(255,233,169,0.92) 0 60%, rgba(255,233,169,0) 60.5%),
+      repeating-conic-gradient(
+        from -3deg,
+        #c8810c 0deg 8deg,
+        #f0bf47 8deg 16deg
+      );
+    box-shadow:
+      0 14px 34px rgba(245,166,35,0.24),
+      inset 0 1px 0 rgba(255,255,255,0.34),
+      inset 0 -10px 16px rgba(106,63,0,0.22);
+    overflow: hidden;
+  }
+  .elite-logo-badge::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 2px solid rgba(124,72,0,0.48);
+    box-shadow:
+      inset 0 0 0 5px rgba(255,243,204,0.52),
+      inset 0 0 0 14px rgba(183,113,8,0.14);
+  }
+  .elite-logo-badge::after {
+    content: '';
+    position: absolute;
+    inset: 16px;
+    border-radius: 50%;
+    border: 2px dashed rgba(124,72,0,0.36);
+  }
+  .elite-logo-badge-top,
+  .elite-logo-badge-stars,
+  .elite-logo-badge-ribbon {
+    position: absolute;
+    z-index: 1;
+    font-family: 'Bebas Neue', sans-serif;
+    line-height: 1;
+    color: #5f3700;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.18);
+  }
+  .elite-logo-badge-top {
+    top: 11px;
+    font-size: 14px;
+    letter-spacing: 3px;
+  }
+  .elite-logo-badge-stars {
+    top: 28px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    opacity: 0.78;
+  }
+  .elite-logo-badge-ribbon {
+    top: 38px;
+    left: -20px;
+    right: -20px;
+    padding: 8px 0 7px;
+    background:
+      linear-gradient(180deg, #ffe89f 0%, #f0bf47 34%, #c88411 100%);
+    border-top: 1px solid rgba(96,56,0,0.4);
+    border-bottom: 1px solid rgba(96,56,0,0.4);
+    transform: rotate(-12deg);
+    font-size: 16px;
+    letter-spacing: 2px;
+    box-shadow:
+      0 4px 10px rgba(96,56,0,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .elite-hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 58px;
+    letter-spacing: 2px;
+    color: var(--red);
+    margin-bottom: 8px;
+  }
+  .elite-hero-copy {
+    max-width: 720px;
+    margin: 0 auto 22px;
+    color: var(--white-dim);
+    font-size: 15px;
+  }
+  .elite-hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .elite-logo-gallery {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .elite-logo-option {
+    min-width: 138px;
+    padding: 14px 14px 12px;
+    border: 1px solid var(--dark4);
+    background: rgba(255,255,255,0.02);
+  }
+  .elite-logo-option-active {
+    border-color: var(--red);
+    box-shadow: inset 0 0 0 1px rgba(232,25,44,0.18);
+  }
+  .elite-logo-option .elite-hero-logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+  }
+  .elite-logo-option .elite-logo-shield,
+  .elite-logo-option .elite-logo-ring,
+  .elite-logo-option .elite-logo-badge {
+    width: 64px;
+    height: 64px;
+  }
+  .elite-logo-option .elite-logo-word-top {
+    top: 14px;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .elite-logo-option .elite-logo-word-bottom {
+    top: 29px;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+  .elite-logo-option .elite-logo-divider {
+    top: 25px;
+    width: 18px;
+  }
+  .elite-logo-option .elite-logo-ring-fighter {
+    width: 20px;
+    height: 34px;
+    top: 15px;
+  }
+  .elite-logo-option .elite-logo-ring-fighter-left { left: 9px; }
+  .elite-logo-option .elite-logo-ring-fighter-right { right: 9px; }
+  .elite-logo-option .elite-logo-ring-head {
+    width: 8px;
+    height: 8px;
+    left: 5px;
+  }
+  .elite-logo-option .elite-logo-ring-body {
+    width: 10px;
+    height: 13px;
+    left: 4px;
+    top: 9px;
+  }
+  .elite-logo-option .elite-logo-ring-arm {
+    width: 10px;
+    height: 4px;
+    top: 12px;
+  }
+  .elite-logo-option .elite-logo-ring-arm-front {
+    left: 9px;
+    box-shadow: 6px -2px 0 1px currentColor;
+  }
+  .elite-logo-option .elite-logo-ring-arm-back {
+    left: -1px;
+  }
+  .elite-logo-option .elite-logo-ring-leg {
+    width: 10px;
+    height: 4px;
+    top: 24px;
+  }
+  .elite-logo-option .elite-logo-ring-leg-front { left: 9px; }
+  .elite-logo-option .elite-logo-ring-leg-back { left: -1px; }
+  .elite-logo-option .elite-logo-badge-top {
+    top: 10px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .elite-logo-option .elite-logo-badge-stars {
+    top: 22px;
+    font-size: 8px;
+  }
+  .elite-logo-option .elite-logo-badge-ribbon {
+    top: 28px;
+    left: -13px;
+    right: -13px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 5px 0 4px;
+  }
+  .elite-logo-name {
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+  .elite-search-bar {
+    justify-content: center;
+  }
+  .elite-profiles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .elite-profile-card {
+    background: var(--dark2);
+    border: 1px solid var(--dark4);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .elite-profile-accent {
+    display: inline-flex;
+    background: var(--red);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 14px;
+    margin-bottom: 18px;
+  }
+  .elite-profile-main {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) 150px minmax(220px, 1.2fr) 170px;
+    gap: 20px;
+    align-items: center;
+  }
+  .elite-profile-summary h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .elite-profile-summary p,
+  .elite-profile-meta div {
+    color: var(--white-dim);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .elite-profile-summary strong,
+  .elite-profile-meta strong {
+    color: var(--white);
+  }
+  .elite-profile-photo {
+    width: 150px;
+    height: 150px;
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    font-size: 48px;
+    color: var(--gray-light);
+  }
+  .elite-profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* COMPARE */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .compare-card {
+    background: var(--dark2);
+    border: 1px solid var(--dark4);
+    padding: 22px;
+  }
+  .compare-card-empty {
+    display: flex;
+    min-height: 220px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: var(--gray-light);
+    text-align: center;
+  }
+  .compare-empty-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .compare-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+  .compare-card-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .compare-card-sub {
+    color: var(--gray-light);
+    font-size: 13px;
+  }
+  .compare-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .compare-stat {
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    padding: 12px 14px;
+  }
+  .compare-stat span {
+    display: block;
+    color: var(--gray-light);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .compare-stat strong {
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    line-height: 1.1;
+  }
+
   /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
@@ -287,6 +891,17 @@
   .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--gray-light); font-size: 24px; cursor: pointer; }
   .modal-close:hover { color: var(--white); }
   .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; margin-bottom: 24px; color: var(--white); }
+  .profile-photo-editor-preview {
+    width: 100%;
+    height: 260px;
+    background-color: var(--dark3);
+    border: 1px solid var(--dark4);
+    margin-bottom: 16px;
+    background-position: 50% 50%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
 
   /* TOAST */
   .toast { position: fixed; bottom: 24px; right: 24px; z-index: 3000; background: var(--dark2); border-left: 3px solid #4CAF50; padding: 14px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); transform: translateX(200%); transition: transform 0.3s; pointer-events: none; }

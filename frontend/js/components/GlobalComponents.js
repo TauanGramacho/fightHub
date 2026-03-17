@@ -5,16 +5,31 @@ export function renderNavbar() {
     <div class="nav-links">
       <a onclick="showPage('home')" data-page="home">Início</a>
       <a onclick="showPage('fighters')" data-page="fighters">Lutadores</a>
+      <a onclick="showPage('elite-profiles')" data-page="elite-profiles">Vitrine</a>
       <a onclick="showPage('teams')" data-page="teams">Equipes</a>
       <a onclick="showPage('events')" data-page="events">Eventos</a>
       <a onclick="showPage('rankings')" data-page="rankings">Rankings</a>
     </div>
     <div class="nav-right" id="nav-auth">
+      <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Alternar tema">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-label theme-toggle-label-light">Light</span>
+          <span class="theme-toggle-label theme-toggle-label-dark">Dark</span>
+          <span class="theme-toggle-thumb"></span>
+        </span>
+      </button>
       <button class="btn btn-outline" onclick="showPage('login')">Entrar</button>
       <button class="btn btn-red" onclick="showPage('register')">Cadastrar</button>
     </div>
     <div class="nav-right" id="nav-user" style="display:none">
       <span style="font-size:13px;color:var(--gray-light);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">Olá, <strong style="color:var(--white);" id="user-greeting"></strong></span>
+      <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Alternar tema">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-label theme-toggle-label-light">Light</span>
+          <span class="theme-toggle-label theme-toggle-label-dark">Dark</span>
+          <span class="theme-toggle-thumb"></span>
+        </span>
+      </button>
       <button class="btn btn-red" onclick="logout()">Sair</button>
     </div>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
@@ -24,10 +39,18 @@ export function renderNavbar() {
   <div class="nav-mobile-menu" id="nav-mobile-menu">
     <a onclick="showPage('home');closeMobileMenu()">Início</a>
     <a onclick="showPage('fighters');closeMobileMenu()">Lutadores</a>
+    <a onclick="showPage('elite-profiles');closeMobileMenu()">Vitrine</a>
     <a onclick="showPage('teams');closeMobileMenu()">Equipes</a>
     <a onclick="showPage('events');closeMobileMenu()">Eventos</a>
     <a onclick="showPage('rankings');closeMobileMenu()">Rankings</a>
     <hr class="nav-mobile-divider">
+    <button class="theme-toggle theme-toggle-mobile" type="button" onclick="toggleTheme()" aria-label="Alternar tema">
+      <span class="theme-toggle-track">
+        <span class="theme-toggle-label theme-toggle-label-light">Light</span>
+        <span class="theme-toggle-label theme-toggle-label-dark">Dark</span>
+        <span class="theme-toggle-thumb"></span>
+      </span>
+    </button>
     <div id="nav-mobile-auth">
       <button class="btn btn-outline" style="width:100%;margin-bottom:8px;" onclick="showPage('login');closeMobileMenu()">Entrar</button>
       <button class="btn btn-red" style="width:100%;" onclick="showPage('register');closeMobileMenu()">Cadastrar</button>
@@ -35,6 +58,94 @@ export function renderNavbar() {
     <div id="nav-mobile-user" style="display:none;">
       <div style="color:var(--gray-light);font-size:13px;padding:8px 16px;">Olá, <strong style="color:var(--white);" id="user-greeting-mobile"></strong></div>
       <button class="btn btn-red" style="width:100%;margin-top:4px;" onclick="logout();closeMobileMenu()">Sair</button>
+    </div>
+  </div>
+  <div class="modal-overlay" id="modal-showcase-payment">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modal-showcase-payment')">X</button>
+      <div class="modal-title" id="showcase-pay-title">Vitrine Premium</div>
+      <div style="color:var(--white-dim);font-size:14px;line-height:1.7;margin-bottom:18px;" id="showcase-pay-subtitle"></div>
+      <div class="compare-grid" style="align-items:start;">
+        <div class="compare-card">
+          <div class="compare-card-name" style="font-size:24px;">O que voce ganha</div>
+          <div style="margin-top:14px;color:var(--white-dim);font-size:14px;line-height:1.8;">
+            - Destaque na Vitrine Premium do FightHub<br>
+            - Mais visibilidade para publico, equipes e promotores<br>
+            - Presenca em uma area premium de descoberta e comparacao<br>
+            - Entrada em analise editorial apos o pagamento
+          </div>
+          <div style="margin-top:18px;padding:14px;border:1px solid var(--dark4);background:var(--dark3);">
+            <div class="form-label" style="margin-bottom:6px;">Valor</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:1px;color:var(--gold);" id="showcase-pay-amount">R$ 10,00</div>
+          </div>
+          <div style="margin-top:14px;color:var(--white-dim);font-size:13px;line-height:1.7;" id="showcase-pay-summary"></div>
+        </div>
+        <div class="compare-card">
+          <div style="display:flex;justify-content:center;margin-bottom:14px;">
+            <img id="showcase-pay-qr" src="" alt="QR Code Pix" style="width:220px;height:220px;background:#fff;padding:10px;border-radius:8px;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Chave Pix</label>
+            <div class="form-input" id="showcase-pay-key" style="word-break:break-all;"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pix copia e cola</label>
+            <textarea class="form-input" id="showcase-pay-code" rows="5" readonly style="resize:none;"></textarea>
+          </div>
+          <div style="color:var(--gray-light);font-size:12px;line-height:1.6;margin:-4px 0 14px;">
+            Em celulares, use Compartilhar Pix para enviar direto ao app do banco quando o aparelho oferecer essa opcao.
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-outline" style="flex:1;" onclick="copyShowcasePixCode()">Copiar codigo</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="shareShowcasePixCode()">Compartilhar Pix</button>
+            <button class="btn btn-red" style="flex:1;" id="showcase-pay-confirm" onclick="confirmShowcasePixPayment()">Ja paguei, enviar para analise</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-showcase-benefits">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modal-showcase-benefits')">X</button>
+      <div class="modal-title">Beneficios de Premium</div>
+      <div style="color:var(--white-dim);font-size:14px;line-height:1.7;margin-bottom:18px;">
+        Ao entrar na Vitrine Premium, o atleta passa a ocupar uma area mais nobre do FightHub, com mais autoridade visual e mais chances de ser encontrado por quem realmente procura talentos.
+      </div>
+      <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-stat">
+            <span>Destaque Premium</span>
+            <strong>Perfil em evidencia</strong>
+            <div style="margin-top:8px;color:var(--white-dim);font-size:13px;line-height:1.6;">Seu atleta aparece apenas entre os perfis aprovados da Vitrine, com mais autoridade visual.</div>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-stat">
+            <span>Mais descoberta</span>
+            <strong>Visibilidade ampliada</strong>
+            <div style="margin-top:8px;color:var(--white-dim);font-size:13px;line-height:1.6;">Mais chances de ser encontrado por publico, equipes, promotores e parceiros que entram para pesquisar atletas.</div>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-stat">
+            <span>Comparativo</span>
+            <strong>Presenca nas comparacoes</strong>
+            <div style="margin-top:8px;color:var(--white-dim);font-size:13px;line-height:1.6;">Seu perfil premium ganha mais relevancia nas areas de comparacao e descoberta tecnica do FightHub.</div>
+          </div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-stat">
+            <span>Prova social</span>
+            <strong>Status aprovado</strong>
+            <div style="margin-top:8px;color:var(--white-dim);font-size:13px;line-height:1.6;">Mostra que o atleta passou por curadoria e esta pronto para representar a propria imagem de forma profissional.</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px;">
+        <button class="btn btn-outline" onclick="closeModal('modal-showcase-benefits')">Fechar</button>
+        <button class="btn btn-red" onclick="closeModal('modal-showcase-benefits');openShowcasePaymentModal()">Assinar Vitrine Premium</button>
+      </div>
     </div>
   </div>
   `;
@@ -71,7 +182,7 @@ export function renderModals() {
   <!-- MODAL ADD FIGHTER -->
   <div class="modal-overlay" id="modal-add-fighter">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('modal-add-fighter')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-add-fighter')">X</button>
       <div class="modal-title">Cadastrar Lutador</div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="af-nome" placeholder="NOME" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
@@ -180,7 +291,7 @@ export function renderModals() {
   <!-- MODAL ADD EVENT -->
   <div class="modal-overlay" id="modal-add-event">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('modal-add-event')">✕</button>
+      <button class="modal-close" onclick="closeModal('modal-add-event')">X</button>
       <div class="modal-title">Cadastrar Evento</div>
       <div class="form-group"><label class="form-label">Nome do Evento</label><input class="form-input" id="ae-name" placeholder="FightHub Championship 2025"></div>
       <div class="form-row">
@@ -190,6 +301,39 @@ export function renderModals() {
       <div class="form-group"><label class="form-label">Cidade / Local</label><input class="form-input" id="ae-city" placeholder="São Paulo, SP — Ginásio do Ibirapuera"></div>
       <div class="form-group"><label class="form-label">Número de Lutas</label><input class="form-input" type="number" id="ae-fights" value="8"></div>
       <button class="btn btn-red" style="width:100%;padding:14px;font-size:14px;margin-top:8px;" onclick="addEvent()">Cadastrar Evento</button>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT OWN PROFILE PHOTO -->
+  <div class="modal-overlay" id="modal-edit-profile-photo">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modal-edit-profile-photo')">X</button>
+      <div class="modal-title">Editar Foto do Perfil</div>
+      <div class="form-group">
+        <label class="form-label">Nova Foto</label>
+        <input
+          class="form-input"
+          type="file"
+          id="epf-file"
+          accept="image/jpeg,image/png,image/webp"
+          onchange="previewOwnProfilePhoto(this)"
+        >
+      </div>
+      <div id="epf-current-photo" style="color:var(--gray-light);font-size:13px;margin-bottom:12px;"></div>
+      <div class="profile-photo-editor-preview" id="epf-preview"></div>
+      <div class="form-group">
+        <label class="form-label">Posição Horizontal</label>
+        <input class="form-input" type="range" min="0" max="100" value="50" id="epf-pos-x" oninput="updateProfilePhotoPreview()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Posição Vertical</label>
+        <input class="form-input" type="range" min="0" max="100" value="50" id="epf-pos-y" oninput="updateProfilePhotoPreview()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zoom</label>
+        <input class="form-input" type="range" min="1" max="2.5" step="0.05" value="1" id="epf-zoom" oninput="updateProfilePhotoPreview()">
+      </div>
+      <button class="btn btn-red" id="epf-save-btn" style="width:100%;padding:14px;font-size:14px;margin-top:8px;" onclick="saveOwnProfilePhoto()">Salvar foto</button>
     </div>
   </div>
   `;

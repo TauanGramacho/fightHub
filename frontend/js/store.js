@@ -95,8 +95,11 @@ export const RANKINGS_DATA = {
 // Application State
 export const state = {
   currentUser: null,
+  currentUserProfile: null,
+  currentUserFighterId: null,
   activeFighterId: null,
-  activeTeamId: null
+  activeTeamId: null,
+  activeEventId: null
 };
 
 // =============================================
@@ -122,8 +125,11 @@ export function initSupabase() {
 }
 
 export function mapRowToFighter(row) {
+  const fighterId = Number(row.id);
+  const teamId = row.team_id === null || row.team_id === undefined ? null : Number(row.team_id);
   return {
-    id: row.id,
+    id: Number.isNaN(fighterId) ? row.id : fighterId,
+    auth_id: row.auth_id || null,
     name: row.name || '—',
     nick: row.nick || '"Fighter"',
     nat: row.nationality || '—',
@@ -133,7 +139,7 @@ export function mapRowToFighter(row) {
     height: row.height_cm ? row.height_cm + 'cm' : '—',
     weight: row.weight_kg ? row.weight_kg + 'kg' : '—',
     team: row.team || 'Sem Equipe',
-    teamId: row.team_id || null,
+    teamId: Number.isNaN(teamId) ? row.team_id || null : teamId,
     wins: row.wins || 0,
     losses: row.losses || 0,
     draws: row.draws || 0,
@@ -141,8 +147,99 @@ export function mapRowToFighter(row) {
     flag: row.flag || '🇧🇷',
     bio: row.bio || '',
     photo_url: row.photo_url || null,
+    photo_position: row.photo_position || '50% 50%',
+    photo_zoom: typeof row.photo_zoom === 'number' ? row.photo_zoom : 1,
+    showcase_enabled: Boolean(row.showcase_enabled),
+    showcase_status: row.showcase_status || 'hidden',
+    showcase_plan: row.showcase_plan || 'free',
+    showcase_requested_at: row.showcase_requested_at || null,
+    showcase_approved_at: row.showcase_approved_at || null,
+    showcase_expires_at: row.showcase_expires_at || null,
+    showcase_priority: Number.isFinite(row.showcase_priority) ? row.showcase_priority : 0,
     tags: Array.isArray(row.tags) ? row.tags : [],
   };
+}
+
+export function isCurrentUserAdmin() {
+  const email = state.currentUser?.email?.toLowerCase?.() || '';
+  const role = state.currentUserProfile?.role?.toLowerCase?.() || '';
+  return email === 'codenity.solutions@gmail.com' || role === 'admin';
+}
+
+export async function loadCurrentUserProfile() {
+  if (!window.supabase || !state.currentUser) return null;
+
+  const { data, error } = await window.supabase
+    .from('users')
+    .select('*')
+    .eq('auth_id', state.currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Supabase user profile load:', error);
+    return null;
+  }
+
+  state.currentUserProfile = data || null;
+  return state.currentUserProfile;
+}
+
+export async function ensureCurrentUserFighterLink() {
+  if (!window.supabase || !state.currentUser) return null;
+
+  const linkedResult = await window.supabase
+    .from('fighters')
+    .select('id, auth_id, name')
+    .eq('auth_id', state.currentUser.id)
+    .limit(2);
+
+  if (!linkedResult.error && linkedResult.data?.length === 1) {
+    const linkedFighter = linkedResult.data[0];
+    state.currentUserFighterId = linkedFighter.id;
+
+    const localLinkedFighter = FIGHTERS.find((item) => item.id === linkedFighter.id);
+    if (localLinkedFighter) {
+      localLinkedFighter.auth_id = state.currentUser.id;
+    }
+
+    return linkedFighter.id;
+  }
+
+  if (!state.currentUserProfile?.full_name) return null;
+
+  const normalizedFullName = state.currentUserProfile.full_name.trim().toUpperCase();
+  const { data, error } = await window.supabase
+    .from('fighters')
+    .select('id, auth_id, name')
+    .eq('name', normalizedFullName)
+    .limit(2);
+
+  if (error || !data || data.length !== 1) return null;
+
+  const fighter = data[0];
+  if (fighter.auth_id && fighter.auth_id !== state.currentUser.id) return null;
+
+  if (!fighter.auth_id) {
+    const updateResult = await window.supabase
+      .from('fighters')
+      .update({ auth_id: state.currentUser.id })
+      .eq('id', fighter.id)
+      .select('id, auth_id')
+      .single();
+
+    if (updateResult.error) {
+      console.error('Supabase fighter auth link:', updateResult.error);
+      return null;
+    }
+  }
+
+  const localFighter = FIGHTERS.find((item) => item.id === fighter.id);
+  if (localFighter) {
+    localFighter.auth_id = state.currentUser.id;
+  }
+
+  state.currentUserFighterId = fighter.id;
+  return fighter.id;
 }
 
 export async function loadFightersFromSupabase() {
@@ -159,7 +256,10 @@ export async function loadFightersFromSupabase() {
   }
   if(window.renderHome) window.renderHome();
   if (document.getElementById('page-fighters')?.classList.contains('active')) {
-    if(window.renderFighters) window.renderFighters();
+    if(window.renderFightersList) window.renderFightersList();
+  }
+  if (document.getElementById('page-elite-profiles')?.classList.contains('active')) {
+    if (window.renderEliteProfilesPage) window.renderEliteProfilesPage();
   }
 }
 
@@ -310,6 +410,8 @@ export async function doLogin() {
   }
   
   state.currentUser = data.user;
+  await loadCurrentUserProfile();
+  await ensureCurrentUserFighterLink();
   updateAuthUI();
   window.showPage('home');
   window.showToast('Bem-vindo de volta!');
@@ -360,6 +462,8 @@ export async function doRegister() {
     }, 50);
   } else {
     state.currentUser = data.user;
+    await loadCurrentUserProfile();
+    await ensureCurrentUserFighterLink();
     updateAuthUI();
     window.showPage('home');
     window.showToast('Conta criada com sucesso!');
@@ -387,6 +491,8 @@ export async function logout() {
   if (!window.supabase) return;
   await window.supabase.auth.signOut();
   state.currentUser = null;
+  state.currentUserProfile = null;
+  state.currentUserFighterId = null;
   updateAuthUI();
   window.showPage('home');
   window.showToast('Você saiu da conta.');
@@ -397,7 +503,16 @@ export async function checkUserSession() {
   const { data } = await window.supabase.auth.getSession();
   if (data.session) {
     state.currentUser = data.session.user;
+    await loadCurrentUserProfile();
+    await ensureCurrentUserFighterLink();
     updateAuthUI();
+
+    const currentHash = window.location.hash.replace(/^#/, '');
+    if (currentHash === 'fighter-profile' && state.currentUserFighterId && typeof window.showPage === 'function') {
+      window.showPage('fighter-profile', { id: state.currentUserFighterId });
+    }
+  } else {
+    state.currentUserFighterId = null;
   }
 }
 
@@ -468,6 +583,7 @@ export async function addFighter() {
   }
 
   const payload = {
+    auth_id: state.currentUser?.id || null,
     name: fullName,
     nick: nick,
     nationality: nationality,
@@ -481,14 +597,34 @@ export async function addFighter() {
     draws: parseInt(document.getElementById('af-draws').value, 10) || 0,
     bio: document.getElementById('af-bio').value.trim() || null,
     photo_url: photoUrl,
+    photo_position: '50% 50%',
+    photo_zoom: 1,
+    showcase_enabled: false,
+    showcase_status: 'hidden',
+    showcase_plan: 'free',
+    showcase_priority: 0,
     flag: (nationality.includes('🇧🇷') ? '🇧🇷' : '🌍')
   };
 
-  const { data, error } = await window.supabase.from('fighters').insert(payload).select('*').single();
-  if (error) {
-    window.showToast('Erro ao gravar lutador: ' + error.message, true);
+  let result = await window.supabase.from('fighters').insert(payload).select('*').single();
+  if (result.error) {
+    const fallbackPayload = { ...payload };
+    delete fallbackPayload.auth_id;
+    delete fallbackPayload.photo_position;
+    delete fallbackPayload.photo_zoom;
+    delete fallbackPayload.showcase_enabled;
+    delete fallbackPayload.showcase_status;
+    delete fallbackPayload.showcase_plan;
+    delete fallbackPayload.showcase_priority;
+    result = await window.supabase.from('fighters').insert(fallbackPayload).select('*').single();
+  }
+
+  if (result.error) {
+    window.showToast('Erro ao gravar lutador: ' + result.error.message, true);
     return;
   }
+
+  state.currentUserFighterId = result.data?.id || null;
   
   if (window.closeModal) window.closeModal('modal-add-fighter');
   window.showToast(fullName + ' adicionado com sucesso!');
@@ -497,3 +633,74 @@ export async function addFighter() {
   window.showPage('fighters');
 }
 
+export async function updateFighterPhotoProfile(fighterId, changes) {
+  if (!window.supabase) throw new Error('Supabase não configurado');
+
+  const payload = {
+    photo_url: changes.photo_url,
+    photo_position: changes.photo_position,
+    photo_zoom: changes.photo_zoom,
+  };
+
+  const { data, error } = await window.supabase
+    .from('fighters')
+    .update(payload)
+    .eq('id', fighterId)
+    .select('*')
+    .single();
+
+  if (!error) return data;
+
+  // Fallback para bancos que ainda não receberam as colunas novas.
+  const fallbackPayload = {
+    photo_url: changes.photo_url,
+  };
+
+  const fallbackResult = await window.supabase
+    .from('fighters')
+    .update(fallbackPayload)
+    .eq('id', fighterId)
+    .select('*')
+    .single();
+
+  if (fallbackResult.error) throw fallbackResult.error;
+  return fallbackResult.data;
+}
+
+export async function updateFighterShowcase(fighterId, changes) {
+  if (!window.supabase) throw new Error('Supabase nao configurado');
+
+  const payload = {};
+  [
+    'showcase_enabled',
+    'showcase_status',
+    'showcase_plan',
+    'showcase_requested_at',
+    'showcase_approved_at',
+    'showcase_expires_at',
+    'showcase_priority',
+  ].forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(changes, key)) {
+      payload[key] = changes[key];
+    }
+  });
+
+  const { data, error } = await window.supabase
+    .from('fighters')
+    .update(payload)
+    .eq('id', fighterId)
+    .select('*')
+    .single();
+
+  if (error) throw error;
+
+  const mapped = mapRowToFighter(data);
+  const index = FIGHTERS.findIndex((fighter) => fighter.id === fighterId);
+  if (index >= 0) {
+    FIGHTERS[index] = mapped;
+  } else {
+    FIGHTERS.push(mapped);
+  }
+
+  return mapped;
+}
