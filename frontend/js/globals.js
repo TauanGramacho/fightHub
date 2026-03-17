@@ -324,7 +324,7 @@ function pixField(id, value) {
 function buildPixCopyCode() {
   const merchantName = sanitizePixField('FIGHT HUB', 25);
   const merchantCity = sanitizePixField('SALVADOR', 15);
-  const txid = sanitizePixField(`VITRINE${state.activeFighterId || 'FH'}`, 25);
+  const txid = sanitizePixField('FIGHT HUB', 25);
   const amount = SHOWCASE_PIX_AMOUNT.toFixed(2);
 
   const merchantAccountInfo =
