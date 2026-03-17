@@ -10,7 +10,7 @@ import { renderEliteProfilesScreen, renderCompareScreen } from './screens/EliteP
 
 import { 
   state, FIGHTERS, TEAMS, EVENTS, RANKINGS_DATA, FIGHT_HISTORY, 
-  initSupabase, loadFightersFromSupabase, syncFighterDivisionFromWeight,
+  initSupabase, loadFightersFromSupabase,
   doLogin, doRegister, logout, requireAuth, addFighter, resendConfirmation
 } from './store.js';
 import * as globals from './globals.js';
@@ -30,7 +30,6 @@ window.logout = logout;
 window.requireAuth = requireAuth;
 window.addFighter = addFighter;
 window.resendConfirmation = resendConfirmation;
-window.syncFighterDivisionFromWeight = syncFighterDivisionFromWeight;
 window.toggleMobileMenu = globals.toggleMobileMenu;
 window.closeMobileMenu = globals.closeMobileMenu;
 window.toggleFAB = globals.toggleFAB;
